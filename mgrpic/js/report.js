@@ -155,7 +155,7 @@ const MGRPICReport = (() => {
       <tr>
         <td style="color:${dim.color}; font-weight:600;">${dim.nombre}</td>
         <td style="text-align:center">${dim.peso}%</td>
-        <td style="text-align:center">${dim.sumaBruto !== undefined ? dim.sumaBruto : dim.sumaBruta} / ${dim.maxBruto}</td>
+        <td style="text-align:center">${dim.sumaBruta} / ${dim.maxBruto}</td>
         <td style="text-align:center; font-weight:700; color:${dim.color}">
           ${_pts(dim.puntuacion)}
         </td>

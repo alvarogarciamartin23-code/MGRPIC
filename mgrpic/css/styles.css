@@ -661,6 +661,34 @@ body {
   line-height: 1.5;
 }
 
+/* Fila superior de badge + contador */
+.screen-step-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap-sm);
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Contador "X / N respondidos" dentro de cada dimensión */
+.dim-contador {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  background: #f0f3f8;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 2px 10px;
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.dim-contador--completo {
+  color: var(--color-bajo);
+  background: var(--color-bajo-claro);
+  border-color: var(--color-bajo);
+}
+
 /* Aviso: indicador sin respuesta */
 .indicator-card.sin-respuesta .opciones-list::after {
   content: "⚠ Seleccione una opción para continuar";

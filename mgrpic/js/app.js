@@ -102,6 +102,80 @@ const App = (() => {
     irA(0);
   }
 
+  /* ─────────────────────────────────────────────
+   * Restaura el estado visual de una pantalla de dimensión
+   * (radio buttons + clases selected-*) al navegar hacia ella.
+   * @param {number} numPantalla - 2, 3, 4 o 5.
+   * ───────────────────────────────────────────── */
+  function _restaurarEstadoVisualDimension(numPantalla) {
+    const dimIndex = PANTALLA_A_DIM[numPantalla];
+    if (dimIndex === undefined) return;
+    const dimension = MGRPIC_DATA.dimensiones[dimIndex];
+    const clasesNivel = ['selected-bajo', 'selected-moderado', 'selected-alto'];
+
+    dimension.indicadores.forEach(ind => {
+      const valor = estado.respuestas[ind.id];
+      if (valor === undefined || valor === null || valor === '') return;
+
+      // Marcar el radio button correspondiente
+      const radio = document.querySelector(
+        `input[name="${ind.id}"][value="${valor}"]`
+      );
+      if (radio) radio.checked = true;
+
+      // Quitar clases previas y añadir la correcta al label
+      const contenedor = document.getElementById('opciones-' + ind.id);
+      if (contenedor) {
+        contenedor.querySelectorAll('.opcion-label').forEach(lbl =>
+          lbl.classList.remove('selected-bajo', 'selected-moderado', 'selected-alto')
+        );
+        const lbl = document.getElementById('label-' + ind.id + '-' + valor);
+        if (lbl) lbl.classList.add(clasesNivel[valor]);
+      }
+
+      // Quitar aviso "sin respuesta" si estaba marcado
+      const card = document.getElementById('card-' + ind.id);
+      if (card) card.classList.remove('sin-respuesta');
+    });
+
+    // Actualizar el contador "X / N respondidos" de la dimensión
+    _actualizarContadorDimension(numPantalla);
+  }
+
+  /* ─────────────────────────────────────────────
+   * Restaura los valores del formulario de datos del caso (pantalla 1)
+   * al navegar hacia ella después de haber avanzado.
+   * ───────────────────────────────────────────── */
+  function _restaurarFormularioCaso() {
+    const ids = ['numeroDiligencias', 'unidadPolicial', 'fechaIncautacion',
+                 'tipoActivo', 'organoJudicial', 'observaciones'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && estado.datosCaso[id] !== undefined) {
+        el.value = estado.datosCaso[id];
+      }
+    });
+  }
+
+  /* ─────────────────────────────────────────────
+   * Actualiza el contador "X / N respondidos" en la cabecera
+   * de una pantalla de dimensión ya renderizada.
+   * @param {number} numPantalla - 2 a 5.
+   * ───────────────────────────────────────────── */
+  function _actualizarContadorDimension(numPantalla) {
+    const dimIndex = PANTALLA_A_DIM[numPantalla];
+    if (dimIndex === undefined) return;
+    const dimension = MGRPIC_DATA.dimensiones[dimIndex];
+    const el = document.getElementById('contadorDim' + numPantalla);
+    if (!el) return;
+    const respondidos = dimension.indicadores.filter(
+      ind => estado.respuestas[ind.id] !== undefined && estado.respuestas[ind.id] !== null
+    ).length;
+    const total = dimension.indicadores.length;
+    el.textContent = `${respondidos} / ${total} respondidos`;
+    el.className = 'dim-contador ' + (respondidos === total ? 'dim-contador--completo' : '');
+  }
+
   /* ═══════════════════════════════════════════════
    * II. NAVEGACIÓN
    * ═══════════════════════════════════════════════ */
@@ -122,19 +196,22 @@ const App = (() => {
     const pantallaNueva = document.getElementById('screen' + numeroPantalla);
     if (pantallaNueva) {
       pantallaNueva.classList.remove('hidden');
-      // Scroll al inicio
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // Actualizar cabecera y barra de progreso
     _actualizarCabecera(numeroPantalla);
 
-    // Si es la pantalla de resultados (6), calcular y renderizar
+    // Restaurar estado visual según la pantalla destino
+    if (numeroPantalla === 1) {
+      _restaurarFormularioCaso();
+    }
+    if (numeroPantalla >= 2 && numeroPantalla <= 5) {
+      _restaurarEstadoVisualDimension(numeroPantalla);
+    }
     if (numeroPantalla === 6) {
       _renderizarResultados();
     }
-
-    // Si es la pantalla de informe (7), generar informe
     if (numeroPantalla === 7) {
       _renderizarInforme();
     }
@@ -241,7 +318,10 @@ const App = (() => {
       let html = `
         <div class="screen-container">
           <div class="screen-header">
-            <div class="screen-step-badge">Paso ${paso} de ${TOTAL_PASOS}</div>
+            <div class="screen-step-badge-row">
+              <div class="screen-step-badge">Paso ${paso} de ${TOTAL_PASOS}</div>
+              <span class="dim-contador" id="contadorDim${numPantalla}">0 / ${dim.indicadores.length} respondidos</span>
+            </div>
             <div class="dim-header" style="border-radius: var(--radius-lg); --dim-color: ${colorHex};">
               <div class="dim-header-meta">
                 <span class="dim-badge">${dim.id} — ${dim.codigo}</span>
@@ -333,11 +413,12 @@ const App = (() => {
     const labelSeleccionado = document.getElementById('label-' + indicadorId + '-' + valor);
     if (labelSeleccionado) labelSeleccionado.classList.add(clasesNivel[valor]);
 
-    // Limpiar aviso de "sin respuesta"
+    // Limpiar aviso "sin respuesta"
     const card = document.getElementById('card-' + indicadorId);
     if (card) card.classList.remove('sin-respuesta');
 
-    // Actualizar barra de progreso global
+    // Actualizar contador de la dimensión actual y barra de progreso global
+    _actualizarContadorDimension(estado.pantallaActual);
     _actualizarCabecera(estado.pantallaActual);
   }
 
@@ -484,7 +565,7 @@ const App = (() => {
             scales: {
               y: {
                 beginAtZero: true,
-                max: 40,
+                suggestedMax: Math.max(...resultado.dimensiones.map(d => d.maxPonderado)) + 2,
                 title: { display: true, text: 'Puntos' }
               }
             }
