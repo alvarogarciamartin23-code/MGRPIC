@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MGRPIC — Matriz de Gestión de Riesgo Procesal en la Incautación de Criptoactivos</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       CABECERA GLOBAL (visible en todas las pantallas)
+       ═══════════════════════════════════════════════ -->
+  <header class="app-header" id="appHeader">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="header-acronym">MGRPIC</span>
+        <span class="header-sep">|</span>
+        <span class="header-title">Matriz de Gestión de Riesgo Procesal · Criptoactivos</span>
+      </div>
+      <!-- Indicador de progreso global (oculto en pantalla 0) -->
+      <div class="header-progress" id="headerProgress" aria-hidden="true">
+        <span class="progress-label" id="progressLabel">Paso 1 de 7</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       CONTENEDOR PRINCIPAL DE PANTALLAS
+       ═══════════════════════════════════════════════ -->
+  <main class="app-main" id="appMain">
+
+    <!-- ───────────────────────────────────────────
+         PANTALLA 0 — INICIO
+         ─────────────────────────────────────────── -->
+    <section class="screen" id="screen0" data-screen="0">
+      <div class="home-hero">
+        <div class="home-badge">Herramienta de apoyo a la decisión</div>
+        <h1 class="home-title">
+          <span class="home-acronym">MGRPIC</span>
+          <span class="home-subtitle">Matriz de Gestión de Riesgo Procesal<br>en la Incautación de Criptoactivos</span>
+        </h1>
+        <p class="home-lead">
+          Evaluación sistemática del riesgo procesal asociado a criptoactivos intervenidos
+          en procedimientos penales, conforme a los principios del ordenamiento jurídico español.
+        </p>
+        <button class="btn btn-primary btn-lg" id="btnNuevaEvaluacion" onclick="App.irA(1)">
+          Nueva evaluación
+          <span class="btn-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="home-info-grid">
+
+        <div class="info-card">
+          <div class="info-card-icon">⚖</div>
+          <h3>¿Qué es la MGRPIC?</h3>
+          <p>
+            La MGRPIC es una herramienta de apoyo a la decisión diseñada para agentes
+            de Policía Judicial y Letrados de la Administración de Justicia (LAJ). Permite
+            evaluar de forma objetiva y documentada el riesgo procesal que supone la
+            incautación y custodia de criptoactivos en el marco de un procedimiento penal.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-icon">📋</div>
+          <h3>¿Cómo funciona?</h3>
+          <p>
+            La matriz evalúa <strong>15 indicadores</strong> agrupados en
+            <strong>4 dimensiones ponderadas</strong>: Volatilidad (35&nbsp;%),
+            Custodia (25&nbsp;%), Inejecutabilidad del decomiso (25&nbsp;%) y
+            Riesgo jurídico-procesal (15&nbsp;%). Cada indicador se puntúa en
+            una escala de 0 a 2 (Bajo / Moderado / Alto). La puntuación total,
+            expresada en una escala de 0 a 100, determina el nivel de riesgo global.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-icon">📊</div>
+          <h3>Niveles de riesgo</h3>
+          <ul class="risk-legend">
+            <li>
+              <span class="risk-dot" style="background:#27ae60"></span>
+              <strong>BAJO</strong> (0–25) — Riesgo procesal controlado
+            </li>
+            <li>
+              <span class="risk-dot" style="background:#f39c12"></span>
+              <strong>MODERADO</strong> (26–50) — Riesgo procesal significativo
+            </li>
+            <li>
+              <span class="risk-dot" style="background:#e67e22"></span>
+              <strong>ALTO</strong> (51–75) — Riesgo procesal elevado
+            </li>
+            <li>
+              <span class="risk-dot" style="background:#c0392b"></span>
+              <strong>CRÍTICO</strong> (76–100) — Riesgo procesal máximo
+            </li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-icon">📄</div>
+          <h3>Resultado y uso</h3>
+          <p>
+            Al concluir la evaluación, la aplicación genera automáticamente un
+            <strong>informe estructurado</strong> con la puntuación global, el
+            desglose por dimensiones, la valoración de cada indicador y la
+            orientación operativa recomendada. El informe está diseñado para
+            incorporarse al acta de intervención o elevarse al Juez de Instrucción.
+          </p>
+        </div>
+
+      </div><!-- /.home-info-grid -->
+
+      <footer class="home-footer">
+        <p>
+          Versión 1.0 · Uso exclusivo para procedimientos penales españoles ·
+          Los resultados tienen carácter orientativo y no sustituyen el criterio judicial
+        </p>
+      </footer>
+    </section><!-- /#screen0 -->
+
+
+    <!-- ───────────────────────────────────────────
+         PANTALLA 1 — DATOS DEL CASO
+         ─────────────────────────────────────────── -->
+    <section class="screen hidden" id="screen1" data-screen="1">
+      <div class="screen-container">
+
+        <div class="screen-header">
+          <div class="screen-step-badge">Paso 1 de 7</div>
+          <h2 class="screen-title">Datos del caso</h2>
+          <p class="screen-desc">
+            Introduzca los datos identificativos del procedimiento. Estos datos
+            se incluirán en el encabezado del informe final.
+            Los campos marcados con <span class="required-mark">*</span> son obligatorios.
+          </p>
+        </div>
+
+        <form class="case-form" id="caseForm" novalidate>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="numeroDiligencias">
+                Número de diligencias <span class="required-mark">*</span>
+              </label>
+              <input
+                type="text"
+                id="numeroDiligencias"
+                name="numeroDiligencias"
+                placeholder="Ej.: DP 123/2025 — Juzgado de Instrucción nº 4 de Madrid"
+                autocomplete="off"
+                required
+              />
+              <span class="field-hint">Número de diligencias previas, juicio oral o causa especial.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="unidadPolicial">
+                Unidad policial actuante <span class="required-mark">*</span>
+              </label>
+              <input
+                type="text"
+                id="unidadPolicial"
+                name="unidadPolicial"
+                placeholder="Ej.: UDEF — BLA — Brigada Central de Ciberdelincuencia"
+                autocomplete="off"
+                required
+              />
+              <span class="field-hint">Unidad que tramita las diligencias o realiza la incautación.</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fechaIncautacion">
+                Fecha de la incautación <span class="required-mark">*</span>
+              </label>
+              <input
+                type="date"
+                id="fechaIncautacion"
+                name="fechaIncautacion"
+                required
+              />
+              <span class="field-hint">Fecha en que se practicó la diligencia de intervención.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="tipoActivo">
+                Tipo de activo digital incautado <span class="required-mark">*</span>
+              </label>
+              <input
+                type="text"
+                id="tipoActivo"
+                name="tipoActivo"
+                placeholder="Ej.: Bitcoin (BTC), Ethereum (ETH), USDT, Monero (XMR)…"
+                autocomplete="off"
+                required
+              />
+              <span class="field-hint">Nombre y símbolo del criptoactivo o criptoactivos intervenidos.</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group form-group--full">
+              <label for="organoJudicial">
+                Órgano judicial competente <span class="required-mark">*</span>
+              </label>
+              <input
+                type="text"
+                id="organoJudicial"
+                name="organoJudicial"
+                placeholder="Ej.: Juzgado de Instrucción nº 4 de Madrid"
+                autocomplete="off"
+                required
+              />
+              <span class="field-hint">Juzgado o Tribunal que conoce del procedimiento.</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group form-group--full">
+              <label for="observaciones">Observaciones <span class="optional-mark">(opcional)</span></label>
+              <textarea
+                id="observaciones"
+                name="observaciones"
+                rows="3"
+                placeholder="Cualquier dato adicional relevante para contextualizar la evaluación…"
+              ></textarea>
+              <span class="field-hint">Esta información aparecerá en el apartado de contexto del informe.</span>
+            </div>
+          </div>
+
+          <!-- Mensajes de validación -->
+          <div class="form-error-msg hidden" id="formErrorMsg" role="alert">
+            <span class="error-icon">⚠</span>
+            Por favor, complete todos los campos obligatorios antes de continuar.
+          </div>
+
+        </form><!-- /#caseForm -->
+
+        <div class="screen-nav">
+          <button class="btn btn-secondary" onclick="App.irA(0)">
+            ← Inicio
+          </button>
+          <button class="btn btn-primary" id="btnIniciarEvaluacion" onclick="App.guardarCasoEIrA(2)">
+            Iniciar evaluación →
+          </button>
+        </div>
+
+      </div><!-- /.screen-container -->
+    </section><!-- /#screen1 -->
+
+
+    <!-- ───────────────────────────────────────────
+         PANTALLAS 2-5 — DIMENSIONES (generadas por JS)
+         ─────────────────────────────────────────── -->
+    <section class="screen hidden" id="screen2" data-screen="2"></section>
+    <section class="screen hidden" id="screen3" data-screen="3"></section>
+    <section class="screen hidden" id="screen4" data-screen="4"></section>
+    <section class="screen hidden" id="screen5" data-screen="5"></section>
+
+    <!-- ───────────────────────────────────────────
+         PANTALLA 6 — RESULTADOS (generada por JS)
+         ─────────────────────────────────────────── -->
+    <section class="screen hidden" id="screen6" data-screen="6"></section>
+
+    <!-- ───────────────────────────────────────────
+         PANTALLA 7 — INFORME (generada por JS)
+         ─────────────────────────────────────────── -->
+    <section class="screen hidden" id="screen7" data-screen="7"></section>
+
+  </main><!-- /#appMain -->
+
+
+  <!-- ═══════════════════════════════════════════════
+       ZONA DE IMPRESIÓN (invisible en pantalla, visible al imprimir)
+       ═══════════════════════════════════════════════ -->
+  <div id="printZone" class="print-zone"></div>
+
+
+  <!-- ═══════════════════════════════════════════════
+       SCRIPTS (orden de carga obligatorio)
+       ═══════════════════════════════════════════════ -->
+  <script src="js/data.js"></script>
+  <script src="js/scoring.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Chart.js desde CDN — si no hay conexión, scoring.js usa tabla de fallback -->
+  <script>
+    // Intentar cargar Chart.js; si falla, registrar el fallo para que app.js use la tabla
+    (function() {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+      s.onload  = function() { window.CHARTJS_LOADED = true; };
+      s.onerror = function() { window.CHARTJS_LOADED = false; };
+      document.head.appendChild(s);
+    })();
+  </script>
+
+</body>
+</html>
