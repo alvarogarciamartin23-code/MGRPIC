@@ -1,0 +1,3189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MGRPIC — Matriz de Gestión de Riesgo Procesal en la Incautación de Criptoactivos</title>
+  <style>
+/* ═══════════════════════════════════════════════════════════
+   styles.css — Hoja de estilos principal de la MGRPIC
+   Diseño profesional e institucional. Sin dependencias externas.
+   Paleta: azul institucional oscuro + acentos por nivel de riesgo.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ──────────────────────────────────────────
+   1. RESET Y VARIABLES GLOBALES
+   ────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Paleta institucional */
+  --color-primario:       #1a3a5c;   /* azul oscuro */
+  --color-primario-med:   #1e4f7a;
+  --color-primario-claro: #2e6da4;
+  --color-acento:         #2980b9;
+  --color-acento-hover:   #1a6595;
+
+  /* Grises */
+  --color-bg:             #f4f6f9;
+  --color-surface:        #ffffff;
+  --color-border:         #dde3ec;
+  --color-border-med:     #c8d2e0;
+  --color-text:           #1c2b3a;
+  --color-text-med:       #4a5e72;
+  --color-text-light:     #7a90a4;
+
+  /* Niveles de riesgo */
+  --color-bajo:           #27ae60;
+  --color-bajo-claro:     #d5f5e3;
+  --color-moderado:       #f39c12;
+  --color-moderado-claro: #fef9e7;
+  --color-alto:           #e67e22;
+  --color-alto-claro:     #fdebd0;
+  --color-critico:        #c0392b;
+  --color-critico-claro:  #fadbd8;
+
+  /* Dimensiones */
+  --color-d1:             #6c3483;   /* Volatilidad — morado */
+  --color-d2:             #1a5276;   /* Custodia — azul marino */
+  --color-d3:             #1e8449;   /* Inejecutabilidad — verde */
+  --color-d4:             #922b21;   /* Riesgo jurídico — rojo oscuro */
+
+  /* Tipografía */
+  --font-main:   -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:   'Courier New', Courier, monospace;
+
+  /* Espaciado */
+  --gap-xs:   0.4rem;
+  --gap-sm:   0.75rem;
+  --gap-md:   1.25rem;
+  --gap-lg:   2rem;
+  --gap-xl:   3rem;
+
+  /* Bordes y sombras */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+
+  /* Transiciones */
+  --transition: 200ms ease;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ──────────────────────────────────────────
+   2. CABECERA GLOBAL
+   ────────────────────────────────────────── */
+.app-header {
+  background: var(--color-primario);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.7rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.header-acronym {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #a8d4f5;
+}
+
+.header-sep {
+  color: rgba(255,255,255,.3);
+  font-weight: 300;
+}
+
+.header-title {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,.75);
+  font-weight: 400;
+}
+
+/* Barra de progreso en la cabecera */
+.header-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 220px;
+}
+
+.progress-label {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,.7);
+  white-space: nowrap;
+}
+
+.progress-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #a8d4f5;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+
+/* ──────────────────────────────────────────
+   3. CONTENEDOR PRINCIPAL Y PANTALLAS
+   ────────────────────────────────────────── */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease;
+}
+
+.screen.hidden {
+  display: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Contenedor interior reutilizable */
+.screen-container {
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--gap-lg) var(--gap-md);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+/* Encabezado de pantalla (pasos 1-7) */
+.screen-header {
+  border-left: 4px solid var(--color-acento);
+  padding-left: var(--gap-md);
+}
+
+.screen-step-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-acento);
+  background: #e8f2fb;
+  border: 1px solid #c0d9f0;
+  border-radius: 20px;
+  padding: 2px 10px;
+  margin-bottom: var(--gap-sm);
+}
+
+.screen-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-primario);
+  margin-bottom: 0.4rem;
+}
+
+.screen-desc {
+  color: var(--color-text-med);
+  font-size: 0.95rem;
+  max-width: 680px;
+}
+
+
+/* ──────────────────────────────────────────
+   4. PANTALLA 0 — INICIO
+   ────────────────────────────────────────── */
+#screen0 {
+  background: linear-gradient(160deg, #0f2c47 0%, #1a3a5c 45%, #1e4f7a 100%);
+  color: #fff;
+}
+
+.home-hero {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--gap-xl) var(--gap-lg) var(--gap-lg);
+  text-align: center;
+}
+
+.home-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a8d4f5;
+  background: rgba(168,212,245,.12);
+  border: 1px solid rgba(168,212,245,.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  margin-bottom: var(--gap-md);
+}
+
+.home-acronym {
+  display: block;
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #a8d4f5;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.home-subtitle {
+  display: block;
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  font-weight: 400;
+  color: rgba(255,255,255,.85);
+  line-height: 1.4;
+  margin-bottom: var(--gap-md);
+}
+
+.home-lead {
+  font-size: 1rem;
+  color: rgba(255,255,255,.7);
+  max-width: 560px;
+  margin: 0 auto var(--gap-lg);
+  line-height: 1.7;
+}
+
+/* Grid de tarjetas informativas */
+.home-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--gap-md);
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 var(--gap-md) var(--gap-xl);
+}
+
+.info-card {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-md) var(--gap-md);
+  transition: background var(--transition);
+}
+
+.info-card:hover {
+  background: rgba(255,255,255,.11);
+}
+
+.info-card-icon {
+  font-size: 1.6rem;
+  margin-bottom: var(--gap-sm);
+  line-height: 1;
+}
+
+.info-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #a8d4f5;
+  margin-bottom: 0.5rem;
+}
+
+.info-card p,
+.info-card ul {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,.72);
+  line-height: 1.65;
+}
+
+/* Lista de niveles de riesgo */
+.risk-legend {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.risk-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,.8);
+}
+
+.risk-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.home-footer {
+  text-align: center;
+  padding: var(--gap-md) var(--gap-md) var(--gap-lg);
+  font-size: 0.75rem;
+  color: rgba(255,255,255,.4);
+  border-top: 1px solid rgba(255,255,255,.08);
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+
+/* ──────────────────────────────────────────
+   5. PANTALLA 1 — FORMULARIO DATOS DEL CASO
+   ────────────────────────────────────────── */
+.case-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-md);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 0.93rem;
+  color: var(--color-text);
+  background: #fff;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--color-acento);
+  box-shadow: 0 0 0 3px rgba(41,128,185,.15);
+}
+
+.form-group input.invalid,
+.form-group textarea.invalid {
+  border-color: var(--color-critico);
+  box-shadow: 0 0 0 3px rgba(192,57,43,.12);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.field-hint {
+  font-size: 0.78rem;
+  color: var(--color-text-light);
+  line-height: 1.4;
+}
+
+.required-mark {
+  color: var(--color-critico);
+  font-weight: 700;
+}
+
+.optional-mark {
+  color: var(--color-text-light);
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+/* Mensaje de error del formulario */
+.form-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: var(--color-critico-claro);
+  border: 1px solid #f1948a;
+  border-radius: var(--radius-sm);
+  color: #922b21;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.error-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+
+/* ──────────────────────────────────────────
+   6. PANTALLAS DE DIMENSIONES (2-5)
+   ────────────────────────────────────────── */
+.dim-header {
+  background: var(--dim-color, var(--color-primario));
+  color: #fff;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--gap-md) var(--gap-lg);
+}
+
+.dim-header-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  margin-bottom: 0.4rem;
+}
+
+.dim-badge {
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.2);
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+.dim-peso {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,.75);
+}
+
+.dim-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.dim-desc {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,.8);
+  margin-top: 0.3rem;
+  max-width: 640px;
+}
+
+/* Lista de indicadores */
+.indicators-list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  overflow: hidden;
+}
+
+.indicator-card {
+  padding: var(--gap-md) var(--gap-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.indicator-card:last-child {
+  border-bottom: none;
+}
+
+.indicator-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-sm);
+  margin-bottom: var(--gap-sm);
+}
+
+.indicator-codigo {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: var(--dim-color-claro, #e8f2fb);
+  color: var(--dim-color, var(--color-primario));
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.indicator-nombre {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.indicator-desc {
+  font-size: 0.86rem;
+  color: var(--color-text-med);
+  margin-bottom: var(--gap-md);
+  line-height: 1.55;
+}
+
+/* Opciones de radio */
+.opciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.opcion-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  user-select: none;
+}
+
+.opcion-label:hover {
+  border-color: var(--color-border-med);
+  background: #f8f9fb;
+}
+
+.opcion-label.selected-bajo {
+  border-color: var(--color-bajo);
+  background: var(--color-bajo-claro);
+}
+
+.opcion-label.selected-moderado {
+  border-color: var(--color-moderado);
+  background: var(--color-moderado-claro);
+}
+
+.opcion-label.selected-alto {
+  border-color: var(--color-alto);
+  background: var(--color-alto-claro);
+}
+
+/* Botón circular de radio personalizado */
+.opcion-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-border-med);
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+  margin-top: 3px;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  position: relative;
+}
+
+.opcion-radio:checked {
+  border-color: var(--radio-color, var(--color-acento));
+  background: var(--radio-color, var(--color-acento));
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+.opcion-radio.radio-bajo:checked     { --radio-color: var(--color-bajo); }
+.opcion-radio.radio-moderado:checked { --radio-color: var(--color-moderado); }
+.opcion-radio.radio-alto:checked     { --radio-color: var(--color-alto); }
+
+.opcion-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.opcion-nivel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.opcion-nivel.nivel-bajo     { color: var(--color-bajo); }
+.opcion-nivel.nivel-moderado { color: #c87f0a; }  /* ámbar oscuro para legibilidad */
+.opcion-nivel.nivel-alto     { color: var(--color-alto); }
+
+.opcion-puntos {
+  font-size: 0.72rem;
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.opcion-etiqueta {
+  font-size: 0.88rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+/* Fila superior de badge + contador */
+.screen-step-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap-sm);
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Contador "X / N respondidos" dentro de cada dimensión */
+.dim-contador {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  background: #f0f3f8;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 2px 10px;
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.dim-contador--completo {
+  color: var(--color-bajo);
+  background: var(--color-bajo-claro);
+  border-color: var(--color-bajo);
+}
+
+/* Aviso: indicador sin respuesta */
+.indicator-card.sin-respuesta .opciones-list::after {
+  content: "⚠ Seleccione una opción para continuar";
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-critico);
+  font-weight: 500;
+}
+
+/* Ayuda contextual del indicador */
+.indicator-ayuda {
+  margin-top: var(--gap-sm);
+  padding: 0.5rem 0.75rem;
+  background: #f0f5fb;
+  border-left: 3px solid var(--color-acento);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.82rem;
+  color: var(--color-text-med);
+  line-height: 1.5;
+}
+
+.indicator-ayuda::before {
+  content: "ℹ ";
+  font-weight: 700;
+  color: var(--color-acento);
+}
+
+
+/* ──────────────────────────────────────────
+   7. PANTALLA 6 — RESULTADOS
+   ────────────────────────────────────────── */
+.results-hero {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--gap-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.results-score-circle {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 6px solid;
+}
+
+.results-score-number {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.results-score-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.results-level-block {
+  flex: 1;
+}
+
+.results-level-text {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  margin-bottom: 0.3rem;
+}
+
+.results-level-desc {
+  font-size: 0.92rem;
+  color: var(--color-text-med);
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+/* Tabla de desglose por dimensiones */
+.dim-breakdown {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.dim-breakdown-title {
+  padding: var(--gap-sm) var(--gap-md);
+  background: #f8f9fb;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-med);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dim-breakdown-row {
+  display: grid;
+  grid-template-columns: 200px 1fr 90px;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: 0.85rem var(--gap-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dim-breakdown-row:last-child {
+  border-bottom: none;
+}
+
+.dim-breakdown-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dim-breakdown-peso {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  font-weight: 400;
+}
+
+.dim-bar-wrap {
+  height: 12px;
+  background: var(--color-bg);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.dim-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+
+.dim-breakdown-pts {
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* Cuadro de orientación operativa */
+.orientacion-box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.orientacion-header {
+  padding: var(--gap-sm) var(--gap-md);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+
+.orientacion-body {
+  padding: var(--gap-md);
+}
+
+.orientacion-body ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.orientacion-body ul li {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  line-height: 1.55;
+}
+
+.orientacion-body ul li::before {
+  content: "▸";
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  margin-top: 3px;
+}
+
+/* Gráfico de barras / tabla de fallback */
+.chart-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-container canvas {
+  max-height: 280px;
+}
+
+.chart-fallback-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.chart-fallback-table th {
+  background: #f0f3f8;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-med);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.chart-fallback-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+
+/* ──────────────────────────────────────────
+   8. PANTALLA 7 — INFORME
+   ────────────────────────────────────────── */
+.report-actions {
+  display: flex;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
+}
+
+.report-body {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-lg);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.report-section {
+  margin-bottom: var(--gap-lg);
+}
+
+.report-section:last-child {
+  margin-bottom: 0;
+}
+
+.report-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primario);
+  border-bottom: 2px solid var(--color-primario);
+  padding-bottom: 0.3rem;
+  margin-bottom: var(--gap-sm);
+}
+
+.report-field {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 0.35rem var(--gap-sm);
+  padding: 0.3rem 0;
+  border-bottom: 1px dashed var(--color-border);
+  font-size: 0.88rem;
+}
+
+.report-field:last-child {
+  border-bottom: none;
+}
+
+.report-field-label {
+  font-weight: 600;
+  color: var(--color-text-med);
+}
+
+.report-indicator-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px;
+  gap: 0.3rem var(--gap-sm);
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--color-border);
+  font-size: 0.86rem;
+  align-items: start;
+}
+
+.report-indicator-row:last-child {
+  border-bottom: none;
+}
+
+.report-ind-codigo {
+  font-weight: 700;
+  color: var(--color-text-med);
+}
+
+.report-ind-nivel {
+  font-weight: 700;
+  text-align: right;
+}
+
+.report-total-box {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: var(--gap-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--gap-md);
+}
+
+.report-total-score {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.report-total-nivel {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+
+/* ──────────────────────────────────────────
+   9. NAVEGACIÓN ENTRE PANTALLAS
+   ────────────────────────────────────────── */
+.screen-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--gap-sm);
+  border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+}
+
+.screen-nav-right {
+  display: flex;
+  gap: var(--gap-sm);
+  margin-left: auto;
+}
+
+
+/* ──────────────────────────────────────────
+   10. BOTONES
+   ────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--color-acento);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(41,128,185,.3);
+}
+
+.btn-primary:hover {
+  background: var(--color-acento-hover);
+  box-shadow: 0 4px 12px rgba(41,128,185,.35);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: var(--color-text-med);
+  border: 1.5px solid var(--color-border-med);
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg);
+  border-color: var(--color-acento);
+  color: var(--color-acento);
+}
+
+.btn-lg {
+  padding: 0.85rem 2rem;
+  font-size: 1rem;
+  border-radius: var(--radius-md);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: rgba(255,255,255,.85);
+  border: 1.5px solid rgba(255,255,255,.35);
+}
+
+.btn-ghost:hover {
+  background: rgba(255,255,255,.1);
+  color: #fff;
+}
+
+.btn-arrow {
+  font-size: 1.1em;
+  transition: transform var(--transition);
+}
+
+.btn:hover .btn-arrow {
+  transform: translateX(3px);
+}
+
+.btn-print {
+  background: var(--color-primario);
+  color: #fff;
+}
+
+.btn-print:hover {
+  background: var(--color-primario-med);
+}
+
+
+/* ──────────────────────────────────────────
+   11. UTILIDADES
+   ────────────────────────────────────────── */
+.hidden {
+  display: none !important;
+}
+
+.text-center { text-align: center; }
+
+/* Colores de nivel reutilizables */
+.color-bajo     { color: var(--color-bajo); }
+.color-moderado { color: var(--color-moderado); }
+.color-alto     { color: var(--color-alto); }
+.color-critico  { color: var(--color-critico); }
+
+.bg-bajo     { background: var(--color-bajo); }
+.bg-moderado { background: var(--color-moderado); }
+.bg-alto     { background: var(--color-alto); }
+.bg-critico  { background: var(--color-critico); }
+
+
+/* ──────────────────────────────────────────
+   12. IMPRESIÓN
+   ────────────────────────────────────────── */
+.print-zone {
+  display: none;
+}
+
+@media print {
+  /* Ocultar todo excepto la zona de impresión */
+  body > * {
+    display: none !important;
+  }
+
+  .print-zone {
+    display: block !important;
+    font-family: var(--font-main);
+    font-size: 11pt;
+    color: #000;
+    line-height: 1.5;
+    padding: 0;
+  }
+
+  .print-zone .report-section-title {
+    font-size: 9pt;
+    border-bottom: 1.5pt solid #000;
+    margin-bottom: 6pt;
+  }
+
+  .print-zone .report-field {
+    grid-template-columns: 160pt 1fr;
+    font-size: 10pt;
+  }
+
+  .print-zone .report-total-box {
+    border: 2pt solid #000;
+    padding: 8pt;
+  }
+
+  /* Evitar cortes de página en secciones */
+  .print-zone .report-section {
+    page-break-inside: avoid;
+  }
+
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+}
+
+
+/* ──────────────────────────────────────────
+   13. RESPONSIVE
+   ────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .header-title { display: none; }
+  .header-progress { min-width: 120px; }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .results-hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .dim-breakdown-row {
+    grid-template-columns: 1fr 80px;
+  }
+
+  .dim-breakdown-row .dim-bar-wrap {
+    grid-column: 1 / -1;
+  }
+
+  .report-field {
+    grid-template-columns: 1fr;
+  }
+
+  .report-indicator-row {
+    grid-template-columns: 50px 1fr 70px;
+  }
+
+  .home-info-grid {
+    grid-template-columns: 1fr;
+    padding: 0 var(--gap-sm) var(--gap-lg);
+  }
+}
+  </style>
+</head>
+<body>
+
+  <header class="app-header" id="appHeader">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="header-acronym">MGRPIC</span>
+        <span class="header-sep">|</span>
+        <span class="header-title">Matriz de Gestión de Riesgo Procesal · Criptoactivos</span>
+      </div>
+      <div class="header-progress" id="headerProgress" aria-hidden="true">
+        <span class="progress-label" id="progressLabel">Paso 1 de 7</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main" id="appMain">
+
+    <!-- PANTALLA 0 — INICIO -->
+    <section class="screen" id="screen0" data-screen="0">
+      <div class="home-hero">
+        <div class="home-badge">Herramienta de apoyo a la decisión</div>
+        <h1 class="home-title">
+          <span class="home-acronym">MGRPIC</span>
+          <span class="home-subtitle">Matriz de Gestión de Riesgo Procesal<br>en la Incautación de Criptoactivos</span>
+        </h1>
+        <p class="home-lead">
+          Evaluación sistemática del riesgo procesal asociado a criptoactivos intervenidos
+          en procedimientos penales, conforme a los principios del ordenamiento jurídico español.
+        </p>
+        <button class="btn btn-primary btn-lg" onclick="App.irA(1)">
+          Nueva evaluación <span class="btn-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="home-info-grid">
+        <div class="info-card">
+          <div class="info-card-icon">⚖</div>
+          <h3>¿Qué es la MGRPIC?</h3>
+          <p>La MGRPIC es una herramienta de apoyo a la decisión diseñada para agentes
+          de Policía Judicial y Letrados de la Administración de Justicia (LAJ). Permite
+          evaluar de forma objetiva y documentada el riesgo procesal que supone la
+          incautación y custodia de criptoactivos en el marco de un procedimiento penal.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">📋</div>
+          <h3>¿Cómo funciona?</h3>
+          <p>La matriz evalúa <strong>15 indicadores</strong> agrupados en
+          <strong>4 dimensiones ponderadas</strong>: Volatilidad (35&nbsp;%),
+          Custodia (25&nbsp;%), Inejecutabilidad del decomiso (25&nbsp;%) y
+          Riesgo jurídico-procesal (15&nbsp;%). Cada indicador se puntúa en
+          una escala de 0 a 2 (Bajo / Moderado / Alto). La puntuación total,
+          expresada en una escala de 0 a 100, determina el nivel de riesgo global.</p>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">📊</div>
+          <h3>Niveles de riesgo</h3>
+          <ul class="risk-legend">
+            <li><span class="risk-dot" style="background:#27ae60"></span><strong>BAJO</strong> (0–25) — Riesgo procesal controlado</li>
+            <li><span class="risk-dot" style="background:#f39c12"></span><strong>MODERADO</strong> (26–50) — Riesgo procesal significativo</li>
+            <li><span class="risk-dot" style="background:#e67e22"></span><strong>ALTO</strong> (51–75) — Riesgo procesal elevado</li>
+            <li><span class="risk-dot" style="background:#c0392b"></span><strong>CRÍTICO</strong> (76–100) — Riesgo procesal máximo</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon">📄</div>
+          <h3>Resultado y uso</h3>
+          <p>Al concluir la evaluación, la aplicación genera automáticamente un
+          <strong>informe estructurado</strong> con la puntuación global, el
+          desglose por dimensiones, la valoración de cada indicador y la
+          orientación operativa recomendada. El informe está diseñado para
+          incorporarse al acta de intervención o elevarse al Juez de Instrucción.</p>
+        </div>
+      </div>
+
+      <footer class="home-footer">
+        <p>Versión 1.0 · Uso exclusivo para procedimientos penales españoles ·
+        Los resultados tienen carácter orientativo y no sustituyen el criterio judicial</p>
+      </footer>
+    </section>
+
+    <!-- PANTALLA 1 — DATOS DEL CASO -->
+    <section class="screen hidden" id="screen1" data-screen="1">
+      <div class="screen-container">
+        <div class="screen-header">
+          <div class="screen-step-badge">Paso 1 de 7</div>
+          <h2 class="screen-title">Datos del caso</h2>
+          <p class="screen-desc">Introduzca los datos identificativos del procedimiento. Los campos marcados con <span class="required-mark">*</span> son obligatorios.</p>
+        </div>
+        <form class="case-form" id="caseForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="numeroDiligencias">Número de diligencias <span class="required-mark">*</span></label>
+              <input type="text" id="numeroDiligencias" name="numeroDiligencias" placeholder="Ej.: DP 123/2025 — Juzgado de Instrucción nº 4 de Madrid" autocomplete="off" required />
+              <span class="field-hint">Número de diligencias previas, juicio oral o causa especial.</span>
+            </div>
+            <div class="form-group">
+              <label for="unidadPolicial">Unidad policial actuante <span class="required-mark">*</span></label>
+              <input type="text" id="unidadPolicial" name="unidadPolicial" placeholder="Ej.: UDEF — BLA — Brigada Central de Ciberdelincuencia" autocomplete="off" required />
+              <span class="field-hint">Unidad que tramita las diligencias o realiza la incautación.</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fechaIncautacion">Fecha de la incautación <span class="required-mark">*</span></label>
+              <input type="date" id="fechaIncautacion" name="fechaIncautacion" required />
+              <span class="field-hint">Fecha en que se practicó la diligencia de intervención.</span>
+            </div>
+            <div class="form-group">
+              <label for="tipoActivo">Tipo de activo digital incautado <span class="required-mark">*</span></label>
+              <input type="text" id="tipoActivo" name="tipoActivo" placeholder="Ej.: Bitcoin (BTC), Ethereum (ETH), USDT, Monero (XMR)…" autocomplete="off" required />
+              <span class="field-hint">Nombre y símbolo del criptoactivo o criptoactivos intervenidos.</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group form-group--full">
+              <label for="organoJudicial">Órgano judicial competente <span class="required-mark">*</span></label>
+              <input type="text" id="organoJudicial" name="organoJudicial" placeholder="Ej.: Juzgado de Instrucción nº 4 de Madrid" autocomplete="off" required />
+              <span class="field-hint">Juzgado o Tribunal que conoce del procedimiento.</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group form-group--full">
+              <label for="observaciones">Observaciones <span class="optional-mark">(opcional)</span></label>
+              <textarea id="observaciones" name="observaciones" rows="3" placeholder="Cualquier dato adicional relevante para contextualizar la evaluación…"></textarea>
+              <span class="field-hint">Esta información aparecerá en el apartado de contexto del informe.</span>
+            </div>
+          </div>
+          <div class="form-error-msg hidden" id="formErrorMsg" role="alert">
+            <span class="error-icon">⚠</span>
+            Por favor, complete todos los campos obligatorios antes de continuar.
+          </div>
+        </form>
+        <div class="screen-nav">
+          <button class="btn btn-secondary" onclick="App.irA(0)">← Inicio</button>
+          <button class="btn btn-primary" onclick="App.guardarCasoEIrA(2)">Iniciar evaluación →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLAS 2-5: dimensiones (generadas por JS) -->
+    <section class="screen hidden" id="screen2" data-screen="2"></section>
+    <section class="screen hidden" id="screen3" data-screen="3"></section>
+    <section class="screen hidden" id="screen4" data-screen="4"></section>
+    <section class="screen hidden" id="screen5" data-screen="5"></section>
+
+    <!-- PANTALLA 6: resultados (generada por JS) -->
+    <section class="screen hidden" id="screen6" data-screen="6"></section>
+
+    <!-- PANTALLA 7: informe (generada por JS) -->
+    <section class="screen hidden" id="screen7" data-screen="7"></section>
+
+  </main>
+
+  <div id="printZone" class="print-zone"></div>
+
+  <script>
+/**
+ * data.js — Definición canónica de dimensiones, indicadores y escalas de la MGRPIC.
+ *
+ * Contiene ÚNICAMENTE datos estáticos. No incluye lógica de cálculo ni de interfaz.
+ * Para ajustar ponderaciones, añadir o eliminar indicadores, editar solo este archivo.
+ *
+ * Estructura de puntuación:
+ *   Cada indicador puntúa 0 (Bajo), 1 (Moderado) o 2 (Alto).
+ *   La suma bruta de cada dimensión se multiplica por su factor de ponderación.
+ *   La puntuación total es la suma de las cuatro dimensiones (escala 0-100).
+ *
+ * Fórmulas:
+ *   Dim I  (Volatilidad)              = (V1+V2+V3+V4) × 4.375
+ *   Dim II (Custodia)                 = (C1+C2+C3+C4) × 3.125
+ *   Dim III (Inejecutabilidad)        = (I1+I2+I3+I4) × 3.125
+ *   Dim IV (Riesgo Jurídico-Procesal) = (J1+J2+J3)    × 2.5
+ *   TOTAL = Dim I + Dim II + Dim III + Dim IV  (0-100 puntos)
+ */
+
+const MGRPIC_DATA = {
+
+  version: "1.0",
+  nombre: "Matriz de Gestión de Riesgo Procesal en la Incautación de Criptoactivos",
+  acronimo: "MGRPIC",
+  descripcion: "Herramienta de apoyo a la decisión policial y judicial española para evaluar " +
+               "el riesgo procesal de criptoactivos incautados en procedimientos penales.",
+
+  /* ─────────────────────────────────────────────
+   * ESCALA GLOBAL DE RIESGO (sobre puntuación 0-100)
+   * ───────────────────────────────────────────── */
+  escalaRiesgo: [
+    {
+      nivel:      "BAJO",
+      min:        0,
+      max:        25,
+      color:      "#27ae60",   // verde
+      colorClaro: "#d5f5e3",
+      descripcion: "Riesgo procesal controlado. Las condiciones actuales permiten mantener " +
+                   "la custodia ordinaria sin actuaciones urgentes adicionales."
+    },
+    {
+      nivel:      "MODERADO",
+      min:        26,
+      max:        50,
+      color:      "#f39c12",   // ámbar
+      colorClaro: "#fef9e7",
+      descripcion: "Riesgo procesal significativo. Se recomienda revisar los indicadores " +
+                   "con puntuación alta y adoptar medidas preventivas en el corto plazo."
+    },
+    {
+      nivel:      "ALTO",
+      min:        51,
+      max:        75,
+      color:      "#e67e22",   // naranja
+      colorClaro: "#fdebd0",
+      descripcion: "Riesgo procesal elevado. Se aconseja elevar propuesta motivada al " +
+                   "Juez de Instrucción para adopción de medidas cautelares urgentes " +
+                   "(enajenación anticipada, custodio institucional u otras)."
+    },
+    {
+      nivel:      "CRÍTICO",
+      min:        76,
+      max:        100,
+      color:      "#c0392b",   // rojo
+      colorClaro: "#fadbd8",
+      descripcion: "Riesgo procesal máximo. Actuación inmediata imprescindible. " +
+                   "Se recomienda solicitar con carácter urgente autorización judicial " +
+                   "para enajenación anticipada o custodia institucional especializada."
+    }
+  ],
+
+  /* ─────────────────────────────────────────────
+   * DIMENSIONES E INDICADORES
+   * ───────────────────────────────────────────── */
+  dimensiones: [
+
+    /* ══════════════════════════════════════════
+     * DIMENSIÓN I — VOLATILIDAD
+     * Peso: 35 % | Factor: 4.375 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 35
+     * ══════════════════════════════════════════ */
+    {
+      id:          "D1",
+      codigo:      "V",
+      nombre:      "Volatilidad",
+      peso:        35,           // porcentaje
+      factor:      4.375,        // multiplicador sobre suma bruta
+      maxBruto:    8,            // 4 indicadores × máx. 2 puntos
+      maxPonderado:35,
+      color:       "#6c3483",
+      descripcion: "Evalúa el riesgo de pérdida de valor económico de los criptoactivos " +
+                   "durante la tramitación del procedimiento penal.",
+
+      indicadores: [
+        {
+          id:          "V1",
+          codigo:      "V.1",
+          nombre:      "Naturaleza del activo",
+          descripcion: "Tipo de criptoactivo según su estabilidad y liquidez de mercado.",
+          ayuda:       "Clasifique el activo principal incautado según su categoría de mercado. " +
+                       "Si hay varios activos, valore el de mayor cuantía.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Stablecoin referenciada a moneda fiduciaria (USDT, USDC)"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Criptoactivo de alta capitalización con mercado líquido (BTC, ETH)"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Altcoin de baja capitalización, activo desconocido o token sin mercado secundario activo"
+            }
+          ]
+        },
+        {
+          id:          "V2",
+          codigo:      "V.2",
+          nombre:      "Variación de precio en los 30 días previos",
+          descripcion: "Oscilación porcentual del precio de mercado en el último mes natural.",
+          ayuda:       "Consulte fuentes como CoinMarketCap o CoinGecko para obtener la variación " +
+                       "en los 30 días anteriores a la fecha de evaluación.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Inferior al 10% sin tendencia marcada"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Entre el 10% y el 30%"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Superior al 30% o variación brusca superior al 15% en las últimas 48 horas"
+            }
+          ]
+        },
+        {
+          id:          "V3",
+          codigo:      "V.3",
+          nombre:      "Duración estimada del proceso",
+          descripcion: "Plazo previsible hasta resolución judicial firme que ponga fin al procedimiento.",
+          ayuda:       "Tenga en cuenta la complejidad del asunto, el número de investigados, " +
+                       "la existencia de elementos internacionales y la carga del juzgado.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Menos de 6 meses"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Entre 6 meses y 2 años"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Más de 2 años o causa con complejidad internacional"
+            }
+          ]
+        },
+        {
+          id:          "V4",
+          codigo:      "V.4",
+          nombre:      "Valor total del activo incautado",
+          descripcion: "Contravalor en euros del conjunto de criptoactivos intervenidos a la fecha de evaluación.",
+          ayuda:       "Utilice el tipo de cambio del día de la evaluación. Si hay múltiples activos, " +
+                       "sume todos los contravalores en euros.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Inferior a 10.000 €"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Entre 10.000 € y 500.000 €"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Superior a 500.000 €"
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ══════════════════════════════════════════
+     * DIMENSIÓN II — CUSTODIA
+     * Peso: 25 % | Factor: 3.125 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 25
+     * ══════════════════════════════════════════ */
+    {
+      id:          "D2",
+      codigo:      "C",
+      nombre:      "Custodia",
+      peso:        25,
+      factor:      3.125,
+      maxBruto:    8,
+      maxPonderado:25,
+      color:       "#1a5276",
+      descripcion: "Evalúa la seguridad física y documental del sistema de custodia " +
+                   "de las claves privadas de los criptoactivos incautados.",
+
+      indicadores: [
+        {
+          id:          "C1",
+          codigo:      "C.1",
+          nombre:      "Tipo de soporte de custodia de la clave privada",
+          descripcion: "Medio físico o institucional en que se custodian las claves privadas o la frase semilla.",
+          ayuda:       "Valore el soporte de custodia principal. Si hay múltiples carteras con distintos " +
+                       "soportes, puntúe según el activo de mayor valor.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Custodio institucional especializado (Prosegur Crypto u ORGA) con contrato formalizado"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Monedero frío policial bajo acta formal de entrega al LAJ"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Soporte en papel, dispositivo sin cifrar, soporte no verificado o custodia informal sin acta"
+            }
+          ]
+        },
+        {
+          id:          "C2",
+          codigo:      "C.2",
+          nombre:      "Número de personas con conocimiento de la clave",
+          descripcion: "Cantidad de personas que conocen la clave privada o la frase semilla completa.",
+          ayuda:       "Incluya a todos los agentes, funcionarios y terceros que hayan tenido acceso " +
+                       "a la información de acceso a la cartera.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Una sola persona con acta de entrega y registro nominativo"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Dos o tres personas con registro documentado de acceso"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Más de tres personas o acceso sin documentación formal"
+            }
+          ]
+        },
+        {
+          id:          "C3",
+          codigo:      "C.3",
+          nombre:      "Copia de seguridad de la frase semilla (seed phrase)",
+          descripcion: "Existencia y situación de la copia de respaldo de la frase de recuperación.",
+          ayuda:       "Verifique si existe copia de la seed phrase, dónde se encuentra y si está " +
+                       "bajo custodia judicial formalizada.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Copia verificada en custodia independiente bajo acta judicial"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Copia existente pero sin custodia formal documentada"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Copia no localizada, destruida o en paradero desconocido"
+            }
+          ]
+        },
+        {
+          id:          "C4",
+          codigo:      "C.4",
+          nombre:      "Verificación periódica del saldo en cadena de bloques",
+          descripcion: "Frecuencia y método de comprobación de que los activos permanecen en la dirección custodiada.",
+          ayuda:       "Compruebe si existe protocolo de verificación del saldo y si está documentado. " +
+                       "La verificación puede hacerse con un explorador de bloques (blockexplorer) sin necesidad de acceder a la clave.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Verificación automatizada y documentada con registro de fechas"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Verificación manual realizada al inicio y cada tres meses"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Sin verificación realizada o incapacidad técnica para efectuarla"
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ══════════════════════════════════════════
+     * DIMENSIÓN III — INEJECUTABILIDAD DEL DECOMISO
+     * Peso: 25 % | Factor: 3.125 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 25
+     * ══════════════════════════════════════════ */
+    {
+      id:          "D3",
+      codigo:      "I",
+      nombre:      "Inejecutabilidad del Decomiso",
+      peso:        25,
+      factor:      3.125,
+      maxBruto:    8,
+      maxPonderado:25,
+      color:       "#1e8449",
+      descripcion: "Evalúa los factores que pueden impedir la ejecución efectiva del decomiso " +
+                   "de los criptoactivos una vez dictada la resolución judicial.",
+
+      indicadores: [
+        {
+          id:          "I1",
+          codigo:      "I.1",
+          nombre:      "Calidad de la trazabilidad del activo en la cadena de bloques",
+          descripcion: "Grado de vinculación acreditada entre las direcciones de cartera y el investigado.",
+          ayuda:       "Valore si existe informe forense de blockchain, si la vinculación es directa " +
+                       "(datos KYC del exchange) o inferida mediante heurísticas de agrupamiento.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Dirección pública verificada y vinculada directamente al investigado mediante datos del exchange"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Dirección identificada mediante heurísticas de clustering, sin vinculación directa al investigado"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Activo trazado parcialmente o flujo interrumpido por mixer, tumbler o moneda de privacidad"
+            }
+          ]
+        },
+        {
+          id:          "I2",
+          codigo:      "I.2",
+          nombre:      "Disponibilidad de la clave privada",
+          descripcion: "Situación de la clave privada necesaria para ejecutar el decomiso o la transferencia judicial.",
+          ayuda:       "Indique si las claves han sido obtenidas lícitamente, si están pendientes de " +
+                       "transferencia formal o si son desconocidas/destruidas.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Clave obtenida y bajo custodia formalizada"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Clave conocida pero pendiente de transferencia formal"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Clave desconocida, destruida o en poder exclusivo de un investigado no cooperante"
+            }
+          ]
+        },
+        {
+          id:          "I3",
+          codigo:      "I.3",
+          nombre:      "Situación procesal del investigado",
+          descripcion: "Estado de libertad o detención del investigado y su disposición a cooperar.",
+          ayuda:       "La situación de libertad del investigado con acceso potencial a dispositivos " +
+                       "o conocimiento de las claves aumenta significativamente el riesgo de frustración del decomiso.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Investigado en prisión provisional o en situación de detención"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Investigado en libertad provisional con medidas cautelares personales"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Investigado no localizado, en paradero desconocido o en país sin cooperación judicial"
+            }
+          ]
+        },
+        {
+          id:          "I4",
+          codigo:      "I.4",
+          nombre:      "Localización de los activos respecto a exchanges cooperantes",
+          descripcion: "Situación de los activos en relación con plataformas sometidas a obligaciones de cooperación judicial.",
+          ayuda:       "Valore si los activos están en exchanges regulados en España/UE con protocolo de " +
+                       "cooperación establecido, o en plataformas descentralizadas/no cooperantes.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Todos los activos identificados en exchanges sujetos a obligaciones de cooperación"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Activos parcialmente en exchanges de cooperación limitada o en proceso de identificación"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Activos en exchanges no identificados, descentralizados o en jurisdicciones no cooperantes"
+            }
+          ]
+        }
+      ]
+    },
+
+    /* ══════════════════════════════════════════
+     * DIMENSIÓN IV — RIESGO JURÍDICO-PROCESAL
+     * Peso: 15 % | Factor: 2.5 | Indicadores: 3 | Máx. bruto: 6 | Máx. ponderado: 15
+     * ══════════════════════════════════════════ */
+    {
+      id:          "D4",
+      codigo:      "J",
+      nombre:      "Riesgo Jurídico-Procesal",
+      peso:        15,
+      factor:      2.5,
+      maxBruto:    6,
+      maxPonderado:15,
+      color:       "#922b21",
+      descripcion: "Evalúa los riesgos legales y procesales derivados de la falta de " +
+                   "criterio judicial consolidado y de la posible responsabilidad patrimonial del Estado.",
+
+      indicadores: [
+        {
+          id:          "J1",
+          codigo:      "J.1",
+          nombre:      "Existencia de criterio judicial previo del órgano sobre criptoactivos",
+          descripcion: "Grado de consolidación de doctrina judicial en el juzgado y audiencia de referencia.",
+          ayuda:       "Consulte las resoluciones del juzgado y de la Audiencia Provincial sobre custodia " +
+                       "y enajenación de criptoactivos. La ausencia de criterio propio eleva la incertidumbre procesal.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "El juzgado ha dictado resoluciones previas sobre custodia o enajenación de criptoactivos con criterio consolidado"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "El juzgado carece de criterio propio pero existe doctrina de la Audiencia Provincial de referencia"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Sin precedente en el juzgado ni en la Audiencia; criterio completamente incierto"
+            }
+          ]
+        },
+        {
+          id:          "J2",
+          codigo:      "J.2",
+          nombre:      "Probabilidad de reclamación patrimonial por variación de valor",
+          descripcion: "Riesgo de que el investigado o tercero reclame daños por la pérdida o ganancia de valor durante la custodia.",
+          ayuda:       "Si el activo ha variado más de un 25% desde la incautación sin que se haya adoptado " +
+                       "ninguna decisión de gestión, el riesgo de reclamación patrimonial contra la Administración es elevado.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Activo ya enajenado o convertido; valor congelado documentalmente en el acta"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Activo en custodia con variación de valor documentada pero inferior al umbral de activación"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Activo en custodia con variación superior al 25% desde la incautación y sin decisión de gestión adoptada"
+            }
+          ]
+        },
+        {
+          id:          "J3",
+          codigo:      "J.3",
+          nombre:      "Claridad de la cadena de responsabilidad institucional",
+          descripcion: "Grado de definición formal de quién responde de los activos en cada fase del procedimiento.",
+          ayuda:       "Verifique si existe contrato con custodio, acta de entrega entre LAJ y Policía Judicial, " +
+                       "o si la custodia se desarrolla de forma informal sin documentación de responsabilidad.",
+          opciones: [
+            {
+              valor:    0,
+              nivel:    "Bajo",
+              etiqueta: "Responsabilidad claramente atribuida al custodio institucional mediante contrato o convenio formal"
+            },
+            {
+              valor:    1,
+              nivel:    "Moderado",
+              etiqueta: "Responsabilidad compartida entre LAJ y Policía Judicial con acta de entrega documentada"
+            },
+            {
+              valor:    2,
+              nivel:    "Alto",
+              etiqueta: "Custodia informal sin atribución clara de responsabilidad ni documentación de entrega"
+            }
+          ]
+        }
+      ]
+    }
+
+  ] // fin dimensiones
+
+}; // fin MGRPIC_DATA
+
+// Compatibilidad con entornos Node.js (pruebas unitarias)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = MGRPIC_DATA;
+}
+  </script>
+  <script>
+/**
+ * scoring.js — Lógica de cálculo de puntuaciones de la MGRPIC.
+ *
+ * Completamente independiente de la interfaz de usuario.
+ * Recibe el objeto de respuestas del usuario y devuelve puntuaciones
+ * detalladas por dimensión y la puntuación total ponderada (escala 0-100).
+ *
+ * Fórmulas aplicadas (conforme a data.js):
+ *   Dim I  (Volatilidad)              = (V1+V2+V3+V4) × 4.375   → máx. 35 pts
+ *   Dim II (Custodia)                 = (C1+C2+C3+C4) × 3.125   → máx. 25 pts
+ *   Dim III (Inejecutabilidad)        = (I1+I2+I3+I4) × 3.125   → máx. 25 pts
+ *   Dim IV (Riesgo Jurídico-Procesal) = (J1+J2+J3)    × 2.5     → máx. 15 pts
+ *   TOTAL = Dim I + Dim II + Dim III + Dim IV          → escala 0-100
+ *
+ * Uso:
+ *   const resultado = MGRPICScoring.calcular(respuestas);
+ *
+ * Formato de entrada `respuestas`:
+ *   Objeto plano con claves = id del indicador y valores = número (0, 1 o 2).
+ *   Ejemplo: { V1: 1, V2: 0, V3: 2, V4: 1, C1: 0, ... }
+ *
+ * Formato de salida:
+ *   {
+ *     dimensiones: [ { id, nombre, sumaBruta, maxBruto, puntuacion, maxPonderado, porcentaje, indicadores: [...] } ],
+ *     total:       número (0-100, dos decimales),
+ *     nivelRiesgo: { nivel, min, max, color, colorClaro, descripcion },
+ *     completo:    boolean (true si todos los indicadores tienen respuesta)
+ *   }
+ */
+
+const MGRPICScoring = (() => {
+
+  /**
+   * Determina el nivel de riesgo global según la puntuación total.
+   * @param {number} total - Puntuación total (0-100).
+   * @returns {object} Objeto del nivel de riesgo de MGRPIC_DATA.escalaRiesgo.
+   */
+  function _nivelRiesgo(total) {
+    for (const nivel of MGRPIC_DATA.escalaRiesgo) {
+      if (total >= nivel.min && total <= nivel.max) return nivel;
+    }
+    // Fallback al último nivel si total == 100 exacto
+    return MGRPIC_DATA.escalaRiesgo[MGRPIC_DATA.escalaRiesgo.length - 1];
+  }
+
+  /**
+   * Calcula las puntuaciones completas a partir de las respuestas del usuario.
+   * @param {object} respuestas - { indicadorId: valor (0|1|2), ... }
+   * @returns {object} Resultado detallado (ver cabecera del archivo).
+   */
+  function calcular(respuestas) {
+    respuestas = respuestas || {};
+
+    let totalPuntuacion = 0;
+    let indicadoresPendientes = 0;
+
+    const resultadoDimensiones = MGRPIC_DATA.dimensiones.map(dim => {
+
+      let sumaBruta = 0;
+      const resultadoIndicadores = dim.indicadores.map(ind => {
+        const valor = respuestas[ind.id];
+        const respondido = (valor !== undefined && valor !== null && valor !== '');
+
+        if (!respondido) {
+          indicadoresPendientes++;
+        } else {
+          sumaBruta += Number(valor);
+        }
+
+        // Recuperar la opción seleccionada para mostrar su etiqueta en el informe
+        const opcionSeleccionada = respondido
+          ? ind.opciones.find(o => o.valor === Number(valor)) || null
+          : null;
+
+        return {
+          id:               ind.id,
+          codigo:           ind.codigo,
+          nombre:           ind.nombre,
+          valor:            respondido ? Number(valor) : null,
+          respondido:       respondido,
+          nivel:            opcionSeleccionada ? opcionSeleccionada.nivel    : null,
+          etiquetaElegida:  opcionSeleccionada ? opcionSeleccionada.etiqueta : null
+        };
+      });
+
+      // Puntuación ponderada de la dimensión
+      const puntuacion = parseFloat((sumaBruta * dim.factor).toFixed(4));
+
+      // Porcentaje de riesgo dentro de la dimensión (0-100%)
+      const porcentaje = parseFloat(((sumaBruta / dim.maxBruto) * 100).toFixed(2));
+
+      totalPuntuacion += puntuacion;
+
+      return {
+        id:           dim.id,
+        codigo:       dim.codigo,
+        nombre:       dim.nombre,
+        peso:         dim.peso,
+        factor:       dim.factor,
+        color:        dim.color,
+        sumaBruta:    sumaBruta,
+        maxBruto:     dim.maxBruto,
+        puntuacion:   puntuacion,
+        maxPonderado: dim.maxPonderado,
+        porcentaje:   porcentaje,      // % de riesgo en la dimensión
+        indicadores:  resultadoIndicadores
+      };
+    });
+
+    // Redondear el total a dos decimales
+    totalPuntuacion = parseFloat(totalPuntuacion.toFixed(2));
+
+    return {
+      dimensiones:  resultadoDimensiones,
+      total:        totalPuntuacion,
+      nivelRiesgo:  _nivelRiesgo(totalPuntuacion),
+      completo:     indicadoresPendientes === 0,
+      pendientes:   indicadoresPendientes
+    };
+  }
+
+  /**
+   * Devuelve cuántos indicadores en total tiene la matriz.
+   * @returns {number}
+   */
+  function totalIndicadores() {
+    return MGRPIC_DATA.dimensiones.reduce((acc, dim) => acc + dim.indicadores.length, 0);
+  }
+
+  /**
+   * Devuelve cuántos indicadores han sido respondidos en un objeto de respuestas.
+   * @param {object} respuestas
+   * @returns {number}
+   */
+  function indicadoresRespondidos(respuestas) {
+    respuestas = respuestas || {};
+    let count = 0;
+    MGRPIC_DATA.dimensiones.forEach(dim => {
+      dim.indicadores.forEach(ind => {
+        if (respuestas[ind.id] !== undefined && respuestas[ind.id] !== null && respuestas[ind.id] !== '') {
+          count++;
+        }
+      });
+    });
+    return count;
+  }
+
+  /**
+   * Devuelve el porcentaje de completitud del formulario (0-100).
+   * @param {object} respuestas
+   * @returns {number}
+   */
+  function porcentajeCompletitud(respuestas) {
+    const total = totalIndicadores();
+    if (total === 0) return 0;
+    return Math.round((indicadoresRespondidos(respuestas) / total) * 100);
+  }
+
+  // API pública del módulo
+  return {
+    calcular,
+    totalIndicadores,
+    indicadoresRespondidos,
+    porcentajeCompletitud
+  };
+
+})();
+
+// Compatibilidad con entornos Node.js (pruebas unitarias)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = MGRPICScoring;
+}
+  </script>
+  <script>
+/**
+ * report.js — Generación del informe estructurado de la MGRPIC.
+ *
+ * Responsabilidades:
+ *   · Generar el HTML del informe completo a partir de los datos del caso
+ *     y el resultado del cálculo (devuelto por scoring.js).
+ *   · El HTML generado se inyecta en la pantalla 7 y se copia a la zona
+ *     de impresión cuando el usuario pulsa "Imprimir".
+ *   · Esta función es pura: no lee ni escribe el DOM directamente.
+ *     Solo recibe datos y devuelve HTML.
+ *
+ * Uso:
+ *   const html = MGRPICReport.generar(datosCaso, resultado, orientaciones);
+ *
+ * Dependencias:
+ *   data.js → MGRPIC_DATA (para nombre de la herramienta y versión)
+ */
+
+const MGRPICReport = (() => {
+
+  /* ─────────────────────────────────────────────
+   * UTILIDADES DE FORMATO
+   * ───────────────────────────────────────────── */
+
+  /** Formatea una fecha ISO (YYYY-MM-DD) en formato español (DD/MM/YYYY). */
+  function _fmtFecha(iso) {
+    if (!iso) return '—';
+    const [a, m, d] = iso.split('-');
+    return `${d}/${m}/${a}`;
+  }
+
+  /** Devuelve la fecha y hora actuales en formato español. */
+  function _fmtAhora() {
+    const ahora = new Date();
+    return ahora.toLocaleString('es-ES', {
+      day:    '2-digit', month: '2-digit', year: 'numeric',
+      hour:   '2-digit', minute: '2-digit'
+    });
+  }
+
+  /** Formatea un valor numérico con dos decimales. */
+  function _pts(n) {
+    return Number(n).toFixed(2);
+  }
+
+  /** Devuelve las clases CSS de color correspondientes al nivel de riesgo. */
+  function _estiloNivel(nivelTexto) {
+    const mapa = {
+      'BAJO':     { color: '#27ae60', bg: '#d5f5e3' },
+      'MODERADO': { color: '#f39c12', bg: '#fef9e7' },
+      'ALTO':     { color: '#e67e22', bg: '#fdebd0' },
+      'CRÍTICO':  { color: '#c0392b', bg: '#fadbd8' }
+    };
+    return mapa[nivelTexto] || { color: '#4a5e72', bg: '#f4f6f9' };
+  }
+
+  /* ─────────────────────────────────────────────
+   * FUNCIÓN PRINCIPAL
+   * ───────────────────────────────────────────── */
+
+  /**
+   * Genera el HTML completo del informe MGRPIC.
+   *
+   * @param {object} datosCaso - Campos del formulario de la pantalla 1.
+   * @param {object} resultado - Resultado de MGRPICScoring.calcular().
+   * @param {object} orientaciones - Objeto { NIVEL: [array de recomendaciones] }.
+   * @returns {string} HTML del informe listo para inyectar en el DOM.
+   */
+  function generar(datosCaso, resultado, orientaciones) {
+    const nivel      = resultado.nivelRiesgo;
+    const estilos    = _estiloNivel(nivel.nivel);
+    const ahora      = _fmtAhora();
+    const oriList    = (orientaciones[nivel.nivel] || [])
+                         .map(p => `<li>${p}</li>`).join('');
+
+    // ── 1. Encabezado institucional ──────────────────────────────────────
+    const secEncabezado = `
+      <div class="report-section">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;
+                    border-bottom: 2px solid #1a3a5c; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+          <div>
+            <div style="font-size:1.5rem; font-weight:800; color:#1a3a5c; letter-spacing:0.06em;">
+              MGRPIC
+            </div>
+            <div style="font-size:0.82rem; color:#4a5e72; max-width:480px; line-height:1.4;">
+              ${MGRPIC_DATA.nombre}
+            </div>
+          </div>
+          <div style="text-align:right; font-size:0.78rem; color:#7a90a4; line-height:1.7;">
+            <div>Versión ${MGRPIC_DATA.version}</div>
+            <div>Generado: ${ahora}</div>
+          </div>
+        </div>
+        <div style="font-size:0.78rem; color:#7a90a4; font-style:italic;">
+          Los resultados de este informe tienen carácter orientativo y no sustituyen el criterio
+          judicial ni la valoración jurídica de los profesionales responsables del procedimiento.
+        </div>
+      </div>`;
+
+    // ── 2. Datos del caso ────────────────────────────────────────────────
+    const campos = [
+      ['Número de diligencias',      datosCaso.numeroDiligencias],
+      ['Unidad policial actuante',   datosCaso.unidadPolicial],
+      ['Fecha de la incautación',    _fmtFecha(datosCaso.fechaIncautacion)],
+      ['Tipo de activo incautado',   datosCaso.tipoActivo],
+      ['Órgano judicial competente', datosCaso.organoJudicial],
+    ];
+    const filasCase = campos.map(([lbl, val]) => `
+      <div class="report-field">
+        <span class="report-field-label">${lbl}</span>
+        <span>${val || '—'}</span>
+      </div>`).join('');
+
+    const obsHtml = datosCaso.observaciones
+      ? `<div class="report-field">
+           <span class="report-field-label">Observaciones</span>
+           <span>${datosCaso.observaciones}</span>
+         </div>`
+      : '';
+
+    const secDatosCaso = `
+      <div class="report-section">
+        <div class="report-section-title">1. Datos del Procedimiento</div>
+        ${filasCase}
+        ${obsHtml}
+      </div>`;
+
+    // ── 3. Puntuación global ─────────────────────────────────────────────
+    const secGlobal = `
+      <div class="report-section">
+        <div class="report-section-title">2. Puntuación Global de Riesgo Procesal</div>
+        <div class="report-total-box"
+             style="background:${estilos.bg}; border: 2px solid ${estilos.color};">
+          <div>
+            <div class="report-total-score" style="color:${estilos.color}">
+              ${_pts(resultado.total)}
+            </div>
+            <div style="font-size:0.78rem; color:${estilos.color}; font-weight:600;">
+              puntos sobre 100
+            </div>
+          </div>
+          <div style="flex:1; padding-left: 1rem; border-left: 2px solid ${estilos.color};">
+            <div class="report-total-nivel" style="color:${estilos.color}">
+              RIESGO ${nivel.nivel}
+            </div>
+            <div style="font-size:0.88rem; color:#4a5e72; margin-top:0.3rem; line-height:1.55;">
+              ${nivel.descripcion}
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    // ── 4. Desglose por dimensiones ──────────────────────────────────────
+    const filasDim = resultado.dimensiones.map(dim => `
+      <tr>
+        <td style="color:${dim.color}; font-weight:600;">${dim.nombre}</td>
+        <td style="text-align:center">${dim.peso}%</td>
+        <td style="text-align:center">${dim.sumaBruta} / ${dim.maxBruto}</td>
+        <td style="text-align:center; font-weight:700; color:${dim.color}">
+          ${_pts(dim.puntuacion)}
+        </td>
+        <td style="text-align:center; color:#4a5e72">${dim.maxPonderado}</td>
+        <td style="text-align:center">${dim.porcentaje}%</td>
+      </tr>`).join('');
+
+    const secDesglose = `
+      <div class="report-section">
+        <div class="report-section-title">3. Desglose por Dimensión</div>
+        <table style="width:100%; border-collapse:collapse; font-size:0.86rem;">
+          <thead>
+            <tr style="background:#f0f3f8;">
+              <th style="padding:0.45rem 0.6rem; text-align:left; font-size:0.78rem;
+                         text-transform:uppercase; letter-spacing:0.05em; color:#4a5e72;
+                         border-bottom:2px solid #dde3ec;">Dimensión</th>
+              <th style="padding:0.45rem 0.6rem; text-align:center; font-size:0.78rem;
+                         text-transform:uppercase; letter-spacing:0.05em; color:#4a5e72;
+                         border-bottom:2px solid #dde3ec;">Peso</th>
+              <th style="padding:0.45rem 0.6rem; text-align:center; font-size:0.78rem;
+                         text-transform:uppercase; letter-spacing:0.05em; color:#4a5e72;
+                         border-bottom:2px solid #dde3ec;">Suma bruta</th>
+              <th style="padding:0.45rem 0.6rem; text-align:center; font-size:0.78rem;
+                         text-transform:uppercase; letter-spacing:0.05em; color:#4a5e72;
+                         border-bottom:2px solid #dde3ec;">Puntuación</th>
+              <th style="padding:0.45rem 0.6rem; text-align:center; font-size:0.78rem;
+                         text-transform:uppercase; letter-spacing:0.05em; color:#4a5e72;
+                         border-bottom:2px solid #dde3ec;">Máximo</th>
+              <th style="padding:0.45rem 0.6rem; text-align:center; font-size:0.78rem;
+                         text-transform:uppercase; letter-spacing:0.05em; color:#4a5e72;
+                         border-bottom:2px solid #dde3ec;">% Riesgo dim.</th>
+            </tr>
+          </thead>
+          <tbody>${filasDim}</tbody>
+          <tfoot>
+            <tr style="background:#f8f9fb; font-weight:700; border-top:2px solid #dde3ec;">
+              <td style="padding:0.45rem 0.6rem;" colspan="3">TOTAL</td>
+              <td style="padding:0.45rem 0.6rem; text-align:center; color:${estilos.color}; font-size:1rem;">
+                ${_pts(resultado.total)}
+              </td>
+              <td style="padding:0.45rem 0.6rem; text-align:center">100</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>`;
+
+    // ── 5. Valoración indicador a indicador ──────────────────────────────
+    const bloquesDim = resultado.dimensiones.map(dim => {
+      const coloresNivel = {
+        'Bajo':     '#27ae60',
+        'Moderado': '#c87f0a',
+        'Alto':     '#e67e22'
+      };
+
+      const filasInd = dim.indicadores.map(ind => `
+        <div class="report-indicator-row">
+          <span class="report-ind-codigo" style="color:${dim.color}">${ind.codigo}</span>
+          <span>
+            <strong>${ind.nombre}</strong><br>
+            <span style="font-size:0.82rem; color:#4a5e72; font-style:italic;">${ind.etiquetaElegida || '— No respondido —'}</span>
+          </span>
+          <span class="report-ind-nivel" style="color:${coloresNivel[ind.nivel] || '#4a5e72'}">
+            ${ind.nivel || '—'} (${ind.valor !== null ? ind.valor : '?'})
+          </span>
+        </div>`).join('');
+
+      return `
+        <div style="margin-bottom:1rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem;
+                      font-size:0.82rem; font-weight:700; color:${dim.color};
+                      text-transform:uppercase; letter-spacing:0.06em;
+                      border-bottom:1.5px solid ${dim.color}; padding-bottom:0.25rem;
+                      margin-bottom:0.5rem;">
+            <span>${dim.id}</span>
+            <span>${dim.nombre}</span>
+            <span style="margin-left:auto; font-weight:400; font-size:0.75rem; color:#7a90a4;">
+              ${_pts(dim.puntuacion)} pts / ${dim.maxPonderado}
+            </span>
+          </div>
+          ${filasInd}
+        </div>`;
+    }).join('');
+
+    const secIndicadores = `
+      <div class="report-section">
+        <div class="report-section-title">4. Valoración Detallada por Indicador</div>
+        ${bloquesDim}
+      </div>`;
+
+    // ── 6. Orientación operativa ─────────────────────────────────────────
+    const secOrientacion = `
+      <div class="report-section">
+        <div class="report-section-title">5. Orientación Operativa</div>
+        <div style="background:${estilos.bg}; border-left:4px solid ${estilos.color};
+                    border-radius:4px; padding:0.75rem 1rem; margin-bottom:0.75rem;">
+          <strong style="color:${estilos.color}; font-size:0.95rem;">
+            Nivel de Riesgo: ${nivel.nivel} (${_pts(resultado.total)} puntos)
+          </strong>
+        </div>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:0.5rem;">
+          ${oriList}
+        </ul>
+      </div>`;
+
+    // ── 7. Pie de documento ───────────────────────────────────────────────
+    const secPie = `
+      <div class="report-section" style="border-top:1px solid #dde3ec; padding-top:0.75rem;
+                                          margin-top:1rem;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; font-size:0.8rem; color:#7a90a4;">
+          <div>
+            <strong style="color:#4a5e72">Herramienta:</strong> ${MGRPIC_DATA.acronimo} v${MGRPIC_DATA.version}<br>
+            <strong style="color:#4a5e72">Fecha de generación:</strong> ${ahora}<br>
+            <strong style="color:#4a5e72">Completitud:</strong> ${resultado.completo ? 'Evaluación completa (15/15 indicadores)' : `Evaluación parcial (${15 - resultado.pendientes}/15 indicadores)`}
+          </div>
+          <div style="text-align:right; font-style:italic; line-height:1.6;">
+            Los resultados tienen carácter orientativo.<br>
+            No sustituyen el criterio judicial.<br>
+            Uso exclusivo en procedimientos penales españoles.
+          </div>
+        </div>
+      </div>`;
+
+    // ── Composición final ─────────────────────────────────────────────────
+    return [
+      secEncabezado,
+      secDatosCaso,
+      secGlobal,
+      secDesglose,
+      secIndicadores,
+      secOrientacion,
+      secPie
+    ].join('\n');
+  }
+
+  // API pública
+  return { generar };
+
+})();
+
+// Compatibilidad Node.js
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = MGRPICReport;
+}
+  </script>
+  <script>
+/**
+ * app.js — Lógica principal de navegación y coordinación de la aplicación MGRPIC.
+ *
+ * Responsabilidades:
+ *   · Mantener el estado global de la sesión (datos del caso + respuestas).
+ *   · Gestionar la navegación entre las 8 pantallas (0-7).
+ *   · Renderizar las pantallas de dimensiones (2-5) dinámicamente desde data.js.
+ *   · Actualizar la barra de progreso global.
+ *   · Coordinar scoring.js y report.js para el cálculo y la generación del informe.
+ *   · Gestionar la impresión del informe.
+ *
+ * El estado NO se persiste en localStorage; se mantiene únicamente en memoria.
+ * Si el usuario recarga la página, la evaluación se reinicia.
+ *
+ * Dependencias (deben cargarse antes en index.html):
+ *   data.js → MGRPIC_DATA
+ *   scoring.js → MGRPICScoring
+ *   report.js → MGRPICReport
+ */
+
+const App = (() => {
+
+  /* ─────────────────────────────────────────────
+   * ESTADO GLOBAL DE LA SESIÓN
+   * ───────────────────────────────────────────── */
+  const estado = {
+    /**
+     * Datos del caso introducidos en la pantalla 1.
+     * { numeroDiligencias, unidadPolicial, fechaIncautacion, tipoActivo, organoJudicial, observaciones }
+     */
+    datosCaso: {},
+
+    /**
+     * Respuestas del usuario a los 15 indicadores.
+     * Objeto plano: { V1: 0, V2: 1, C3: 2, ... }
+     */
+    respuestas: {},
+
+    /**
+     * Pantalla actualmente visible (0-7).
+     */
+    pantallaActual: 0,
+
+    /**
+     * Resultado del último cálculo (devuelto por MGRPICScoring.calcular).
+     * Se actualiza cada vez que se navega hacia delante.
+     */
+    ultimoResultado: null
+  };
+
+  /* ─────────────────────────────────────────────
+   * MAPA: número de pantalla → índice de dimensión
+   * pantallas 2,3,4,5 corresponden a dimensiones 0,1,2,3
+   * ───────────────────────────────────────────── */
+  const PANTALLA_A_DIM = { 2: 0, 3: 1, 4: 2, 5: 3 };
+  const TOTAL_PASOS = 7; // pasos numerados 1-7 (pantallas 1-7)
+
+  /* ─────────────────────────────────────────────
+   * ORIENTACIONES OPERATIVAS POR NIVEL DE RIESGO
+   * ───────────────────────────────────────────── */
+  const ORIENTACIONES = {
+    "BAJO": [
+      "Mantener la custodia ordinaria de los criptoactivos con las medidas actualmente adoptadas.",
+      "Documentar el estado de la custodia en el acta de intervención y verificar periódicamente el saldo en blockchain.",
+      "No se aprecia necesidad de actuación urgente. Continuar el procedimiento con la tramitación habitual.",
+      "Informar al Juez de Instrucción del estado de la incautación con periodicidad trimestral o ante cualquier variación significativa."
+    ],
+    "MODERADO": [
+      "Revisar los indicadores con puntuación Moderado o Alto e identificar las deficiencias subsanables a corto plazo.",
+      "Valorar la conveniencia de elevar propuesta al Juez de Instrucción para la adopción de medidas cautelares preventivas.",
+      "Reforzar la cadena de custodia documentando formalmente todos los accesos y verificaciones periódicas.",
+      "Considerar la contratación de custodio institucional especializado si la duración estimada del proceso supera los 12 meses.",
+      "Documentar el contravalor en euros de los activos con periodicidad mensual para acreditar la variación de valor."
+    ],
+    "ALTO": [
+      "Elevar propuesta motivada al Juez de Instrucción para la adopción urgente de medidas sobre los criptoactivos.",
+      "Solicitar autorización judicial para la contratación de custodio institucional especializado (Prosegur Crypto u ORGA).",
+      "Considerar la enajenación anticipada de los activos si la volatilidad o el riesgo de pérdida son determinantes.",
+      "Realizar verificación inmediata del saldo en blockchain y documentar el estado actual de la custodia.",
+      "Iniciar diligencias para obtener o asegurar las claves privadas si no están bajo control policial.",
+      "Informar al Ministerio Fiscal de la situación para que valore el ejercicio de acciones cautelares adicionales."
+    ],
+    "CRÍTICO": [
+      "ACTUACIÓN INMEDIATA IMPRESCINDIBLE. El riesgo de pérdida o frustración del decomiso es máximo.",
+      "Solicitar con carácter urgente (art. 367 ter LECrim) autorización judicial para enajenación anticipada o conversión a moneda fiat.",
+      "Si los activos están en exchanges, requerir con carácter urgente el bloqueo de las cuentas del investigado.",
+      "Contactar con la Unidad de Decomiso y Gestión de Activos del Ministerio de Justicia para activar el protocolo de actuación.",
+      "Elevar informe al Juez de Instrucción con la presente valoración de riesgo como soporte documental de la urgencia.",
+      "Registrar con carácter inmediato toda incidencia en el acta de incautación para preservar la responsabilidad institucional.",
+      "Valorar la solicitud de perito forense especializado en blockchain si la trazabilidad de los activos está comprometida."
+    ]
+  };
+
+  /* ═══════════════════════════════════════════════
+   * I. INICIALIZACIÓN
+   * ═══════════════════════════════════════════════ */
+  function init() {
+    // Renderizar las pantallas de dimensiones en el DOM (pantallas 2-5)
+    _renderizarPantallasDimensiones();
+
+    // Mostrar pantalla inicial
+    irA(0);
+  }
+
+  /* ─────────────────────────────────────────────
+   * Restaura el estado visual de una pantalla de dimensión
+   * (radio buttons + clases selected-*) al navegar hacia ella.
+   * @param {number} numPantalla - 2, 3, 4 o 5.
+   * ───────────────────────────────────────────── */
+  function _restaurarEstadoVisualDimension(numPantalla) {
+    const dimIndex = PANTALLA_A_DIM[numPantalla];
+    if (dimIndex === undefined) return;
+    const dimension = MGRPIC_DATA.dimensiones[dimIndex];
+    const clasesNivel = ['selected-bajo', 'selected-moderado', 'selected-alto'];
+
+    dimension.indicadores.forEach(ind => {
+      const valor = estado.respuestas[ind.id];
+      if (valor === undefined || valor === null || valor === '') return;
+
+      // Marcar el radio button correspondiente
+      const radio = document.querySelector(
+        `input[name="${ind.id}"][value="${valor}"]`
+      );
+      if (radio) radio.checked = true;
+
+      // Quitar clases previas y añadir la correcta al label
+      const contenedor = document.getElementById('opciones-' + ind.id);
+      if (contenedor) {
+        contenedor.querySelectorAll('.opcion-label').forEach(lbl =>
+          lbl.classList.remove('selected-bajo', 'selected-moderado', 'selected-alto')
+        );
+        const lbl = document.getElementById('label-' + ind.id + '-' + valor);
+        if (lbl) lbl.classList.add(clasesNivel[valor]);
+      }
+
+      // Quitar aviso "sin respuesta" si estaba marcado
+      const card = document.getElementById('card-' + ind.id);
+      if (card) card.classList.remove('sin-respuesta');
+    });
+
+    // Actualizar el contador "X / N respondidos" de la dimensión
+    _actualizarContadorDimension(numPantalla);
+  }
+
+  /* ─────────────────────────────────────────────
+   * Restaura los valores del formulario de datos del caso (pantalla 1)
+   * al navegar hacia ella después de haber avanzado.
+   * ───────────────────────────────────────────── */
+  function _restaurarFormularioCaso() {
+    const ids = ['numeroDiligencias', 'unidadPolicial', 'fechaIncautacion',
+                 'tipoActivo', 'organoJudicial', 'observaciones'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && estado.datosCaso[id] !== undefined) {
+        el.value = estado.datosCaso[id];
+      }
+    });
+  }
+
+  /* ─────────────────────────────────────────────
+   * Actualiza el contador "X / N respondidos" en la cabecera
+   * de una pantalla de dimensión ya renderizada.
+   * @param {number} numPantalla - 2 a 5.
+   * ───────────────────────────────────────────── */
+  function _actualizarContadorDimension(numPantalla) {
+    const dimIndex = PANTALLA_A_DIM[numPantalla];
+    if (dimIndex === undefined) return;
+    const dimension = MGRPIC_DATA.dimensiones[dimIndex];
+    const el = document.getElementById('contadorDim' + numPantalla);
+    if (!el) return;
+    const respondidos = dimension.indicadores.filter(
+      ind => estado.respuestas[ind.id] !== undefined && estado.respuestas[ind.id] !== null
+    ).length;
+    const total = dimension.indicadores.length;
+    el.textContent = `${respondidos} / ${total} respondidos`;
+    el.className = 'dim-contador ' + (respondidos === total ? 'dim-contador--completo' : '');
+  }
+
+  /* ═══════════════════════════════════════════════
+   * II. NAVEGACIÓN
+   * ═══════════════════════════════════════════════ */
+
+  /**
+   * Navega a la pantalla indicada.
+   * @param {number} numeroPantalla - 0 a 7.
+   */
+  function irA(numeroPantalla) {
+    // Ocultar pantalla actual
+    const pantallaAnterior = document.getElementById('screen' + estado.pantallaActual);
+    if (pantallaAnterior) pantallaAnterior.classList.add('hidden');
+
+    // Actualizar estado
+    estado.pantallaActual = numeroPantalla;
+
+    // Mostrar nueva pantalla
+    const pantallaNueva = document.getElementById('screen' + numeroPantalla);
+    if (pantallaNueva) {
+      pantallaNueva.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Actualizar cabecera y barra de progreso
+    _actualizarCabecera(numeroPantalla);
+
+    // Restaurar estado visual según la pantalla destino
+    if (numeroPantalla === 1) {
+      _restaurarFormularioCaso();
+    }
+    if (numeroPantalla >= 2 && numeroPantalla <= 5) {
+      _restaurarEstadoVisualDimension(numeroPantalla);
+    }
+    if (numeroPantalla === 6) {
+      _renderizarResultados();
+    }
+    if (numeroPantalla === 7) {
+      _renderizarInforme();
+    }
+  }
+
+  /**
+   * Valida el formulario de datos del caso, lo guarda y navega a la siguiente pantalla.
+   * Llamado desde el botón "Iniciar evaluación" de la pantalla 1.
+   * @param {number} destino - Número de pantalla destino.
+   */
+  function guardarCasoEIrA(destino) {
+    if (!_validarFormularioCaso()) return;
+    _guardarDatosCaso();
+    irA(destino);
+  }
+
+  /**
+   * Valida que todos los indicadores de una dimensión tengan respuesta
+   * y, si es así, navega a la pantalla siguiente.
+   * @param {number} pantallaOrigen - Número de la pantalla de dimensión actual.
+   * @param {number} destino - Número de pantalla destino.
+   */
+  function validarDimensionEIrA(pantallaOrigen, destino) {
+    const dimIndex = PANTALLA_A_DIM[pantallaOrigen];
+    if (dimIndex === undefined) { irA(destino); return; }
+
+    const dimension = MGRPIC_DATA.dimensiones[dimIndex];
+    let hayPendientes = false;
+
+    dimension.indicadores.forEach(ind => {
+      const card = document.getElementById('card-' + ind.id);
+      const valor = estado.respuestas[ind.id];
+      const pendiente = (valor === undefined || valor === null || valor === '');
+      if (card) {
+        if (pendiente) {
+          card.classList.add('sin-respuesta');
+          hayPendientes = true;
+        } else {
+          card.classList.remove('sin-respuesta');
+        }
+      }
+    });
+
+    if (hayPendientes) {
+      // Hacer scroll al primer indicador sin respuesta
+      const primera = document.querySelector('.sin-respuesta');
+      if (primera) primera.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    irA(destino);
+  }
+
+  /* ═══════════════════════════════════════════════
+   * III. FORMULARIO — PANTALLA 1
+   * ═══════════════════════════════════════════════ */
+
+  function _validarFormularioCaso() {
+    const campos = ['numeroDiligencias', 'unidadPolicial', 'fechaIncautacion', 'tipoActivo', 'organoJudicial'];
+    let valido = true;
+
+    campos.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const vacio = !el.value.trim();
+      el.classList.toggle('invalid', vacio);
+      if (vacio) valido = false;
+    });
+
+    const errorMsg = document.getElementById('formErrorMsg');
+    if (errorMsg) errorMsg.classList.toggle('hidden', valido);
+
+    return valido;
+  }
+
+  function _guardarDatosCaso() {
+    const ids = ['numeroDiligencias', 'unidadPolicial', 'fechaIncautacion', 'tipoActivo', 'organoJudicial', 'observaciones'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      estado.datosCaso[id] = el ? el.value.trim() : '';
+    });
+  }
+
+  /* ═══════════════════════════════════════════════
+   * IV. RENDERIZADO DINÁMICO — PANTALLAS 2-5
+   * ═══════════════════════════════════════════════ */
+
+  /**
+   * Genera el HTML de las cuatro pantallas de dimensiones e inyecta en el DOM.
+   * Se llama una sola vez durante init().
+   */
+  function _renderizarPantallasDimensiones() {
+    MGRPIC_DATA.dimensiones.forEach((dim, idx) => {
+      const numPantalla = idx + 2;   // dimensiones en pantallas 2, 3, 4, 5
+      const paso = numPantalla;      // paso 2, 3, 4, 5 de 7
+      const anterior = numPantalla - 1;
+      const siguiente = numPantalla + 1;
+      const esUltima = numPantalla === 5;
+
+      // Colores de la dimensión con opacidad para badges
+      const colorHex = dim.color;
+      const colorClaro = _colorClaro(colorHex);
+
+      let html = `
+        <div class="screen-container">
+          <div class="screen-header">
+            <div class="screen-step-badge-row">
+              <div class="screen-step-badge">Paso ${paso} de ${TOTAL_PASOS}</div>
+              <span class="dim-contador" id="contadorDim${numPantalla}">0 / ${dim.indicadores.length} respondidos</span>
+            </div>
+            <div class="dim-header" style="border-radius: var(--radius-lg); --dim-color: ${colorHex};">
+              <div class="dim-header-meta">
+                <span class="dim-badge">${dim.id} — ${dim.codigo}</span>
+                <span class="dim-peso">Peso: ${dim.peso}%</span>
+              </div>
+              <div class="dim-title">${dim.nombre}</div>
+              <div class="dim-desc">${dim.descripcion}</div>
+            </div>
+          </div>
+
+          <div class="indicators-list" style="--dim-color: ${colorHex}; --dim-color-claro: ${colorClaro};">
+            ${dim.indicadores.map(ind => _htmlIndicador(ind, colorHex)).join('')}
+          </div>
+
+          <div class="screen-nav">
+            <button class="btn btn-secondary" onclick="App.irA(${anterior})">← Anterior</button>
+            <button class="btn btn-primary" onclick="App.validarDimensionEIrA(${numPantalla}, ${siguiente})">
+              ${esUltima ? 'Ver resultados →' : 'Siguiente →'}
+            </button>
+          </div>
+        </div>`;
+
+      const seccion = document.getElementById('screen' + numPantalla);
+      if (seccion) seccion.innerHTML = html;
+    });
+  }
+
+  /**
+   * Genera el HTML de un indicador con sus opciones de radio.
+   * @param {object} ind - Objeto indicador de data.js.
+   * @param {string} colorHex - Color de la dimensión padre.
+   * @returns {string} HTML del indicador.
+   */
+  function _htmlIndicador(ind, colorHex) {
+    const nivelesClass = ['bajo', 'moderado', 'alto'];
+    const puntosLabel  = ['0 puntos — Riesgo bajo', '1 punto — Riesgo moderado', '2 puntos — Riesgo alto'];
+
+    const opcionesHtml = ind.opciones.map(op => {
+      const nivelClass = nivelesClass[op.valor];
+      const puntosText = puntosLabel[op.valor];
+      return `
+        <label class="opcion-label" id="label-${ind.id}-${op.valor}">
+          <input
+            type="radio"
+            class="opcion-radio radio-${nivelClass}"
+            name="${ind.id}"
+            value="${op.valor}"
+            onchange="App.registrarRespuesta('${ind.id}', ${op.valor})"
+          />
+          <span class="opcion-content">
+            <span class="opcion-nivel nivel-${nivelClass}">${op.nivel}</span>
+            <span class="opcion-puntos">${puntosText}</span>
+            <span class="opcion-etiqueta">${op.etiqueta}</span>
+          </span>
+        </label>`;
+    }).join('');
+
+    return `
+      <div class="indicator-card" id="card-${ind.id}">
+        <div class="indicator-header">
+          <span class="indicator-codigo">${ind.codigo}</span>
+          <span class="indicator-nombre">${ind.nombre}</span>
+        </div>
+        <p class="indicator-desc">${ind.descripcion}</p>
+        <div class="opciones-list" id="opciones-${ind.id}">
+          ${opcionesHtml}
+        </div>
+        <div class="indicator-ayuda">${ind.ayuda}</div>
+      </div>`;
+  }
+
+  /**
+   * Registra la respuesta de un indicador en el estado y actualiza el estilo visual.
+   * @param {string} indicadorId - Id del indicador (ej. "V1").
+   * @param {number} valor - 0, 1 o 2.
+   */
+  function registrarRespuesta(indicadorId, valor) {
+    estado.respuestas[indicadorId] = valor;
+
+    // Quitar clases de selección de todas las opciones del indicador
+    const contenedor = document.getElementById('opciones-' + indicadorId);
+    if (!contenedor) return;
+    contenedor.querySelectorAll('.opcion-label').forEach(lbl => {
+      lbl.classList.remove('selected-bajo', 'selected-moderado', 'selected-alto');
+    });
+
+    // Añadir clase de selección a la opción elegida
+    const clasesNivel = ['selected-bajo', 'selected-moderado', 'selected-alto'];
+    const labelSeleccionado = document.getElementById('label-' + indicadorId + '-' + valor);
+    if (labelSeleccionado) labelSeleccionado.classList.add(clasesNivel[valor]);
+
+    // Limpiar aviso "sin respuesta"
+    const card = document.getElementById('card-' + indicadorId);
+    if (card) card.classList.remove('sin-respuesta');
+
+    // Actualizar contador de la dimensión actual y barra de progreso global
+    _actualizarContadorDimension(estado.pantallaActual);
+    _actualizarCabecera(estado.pantallaActual);
+  }
+
+  /* ═══════════════════════════════════════════════
+   * V. PANTALLA 6 — RESULTADOS
+   * ═══════════════════════════════════════════════ */
+
+  function _renderizarResultados() {
+    const resultado = MGRPICScoring.calcular(estado.respuestas);
+    estado.ultimoResultado = resultado;
+    const nivel = resultado.nivelRiesgo;
+    const seccion = document.getElementById('screen6');
+    if (!seccion) return;
+
+    const orientacion = ORIENTACIONES[nivel.nivel] || [];
+    const orientacionHtml = orientacion.map(p => `<li>${p}</li>`).join('');
+
+    // Desglose por dimensiones
+    const desgloseRows = resultado.dimensiones.map(dim => {
+      const pct = Math.round((dim.puntuacion / dim.maxPonderado) * 100);
+      return `
+        <div class="dim-breakdown-row">
+          <div>
+            <div class="dim-breakdown-name" style="color:${dim.color}">${dim.nombre}</div>
+            <div class="dim-breakdown-peso">Peso ${dim.peso}% · Máx. ${dim.maxPonderado} pts</div>
+          </div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar-fill" style="width:${pct}%; background:${dim.color}"></div>
+          </div>
+          <div class="dim-breakdown-pts" style="color:${dim.color}">
+            ${dim.puntuacion.toFixed(2)} <span style="font-size:.75rem;font-weight:400;color:#7a90a4">/ ${dim.maxPonderado}</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    seccion.innerHTML = `
+      <div class="screen-container">
+        <div class="screen-header">
+          <div class="screen-step-badge">Paso 6 de ${TOTAL_PASOS}</div>
+          <h2 class="screen-title">Resultados de la evaluación</h2>
+          <p class="screen-desc">
+            Puntuación global y desglose por dimensiones del caso
+            <strong>${estado.datosCaso.numeroDiligencias || '—'}</strong>.
+          </p>
+        </div>
+
+        <!-- Puntuación global -->
+        <div class="results-hero" style="border-left: 5px solid ${nivel.color}; background: ${nivel.colorClaro}">
+          <div class="results-score-circle"
+               style="border-color:${nivel.color}; color:${nivel.color}; background:#fff">
+            <span class="results-score-number">${resultado.total.toFixed(1)}</span>
+            <span class="results-score-label">/ 100</span>
+          </div>
+          <div class="results-level-block">
+            <div class="results-level-text" style="color:${nivel.color}">
+              ${nivel.nivel}
+            </div>
+            <div class="results-level-desc">${nivel.descripcion}</div>
+          </div>
+        </div>
+
+        <!-- Gráfico / desglose -->
+        <div class="chart-container">
+          <div class="dim-breakdown-title">Desglose por dimensión</div>
+          <div id="chartWrap">
+            <!-- Chart.js se inyecta aquí si está disponible; si no, tabla de fallback -->
+          </div>
+        </div>
+
+        <!-- Tabla de desglose detallado -->
+        <div class="dim-breakdown">
+          <div class="dim-breakdown-title">Puntuación ponderada por dimensión</div>
+          ${desgloseRows}
+        </div>
+
+        <!-- Orientación operativa -->
+        <div class="orientacion-box">
+          <div class="orientacion-header" style="background:${nivel.color}">
+            Orientación operativa — Nivel ${nivel.nivel}
+          </div>
+          <div class="orientacion-body">
+            <ul>${orientacionHtml}</ul>
+          </div>
+        </div>
+
+        <div class="screen-nav">
+          <button class="btn btn-secondary" onclick="App.irA(5)">← Revisar indicadores</button>
+          <button class="btn btn-primary" onclick="App.irA(7)">Ver informe completo →</button>
+        </div>
+      </div>`;
+
+    // Intentar renderizar gráfico con Chart.js
+    _intentarGraficoBarras(resultado);
+  }
+
+  /**
+   * Renderiza el gráfico de barras con Chart.js si está disponible,
+   * o una tabla de fallback si no hay conexión.
+   */
+  function _intentarGraficoBarras(resultado) {
+    const wrap = document.getElementById('chartWrap');
+    if (!wrap) return;
+
+    const intentar = () => {
+      if (window.CHARTJS_LOADED && typeof Chart !== 'undefined') {
+        // Chart.js disponible
+        const canvas = document.createElement('canvas');
+        canvas.id = 'dimChart';
+        wrap.appendChild(canvas);
+
+        new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels: resultado.dimensiones.map(d => d.nombre),
+            datasets: [
+              {
+                label: 'Puntuación obtenida',
+                data: resultado.dimensiones.map(d => d.puntuacion),
+                backgroundColor: resultado.dimensiones.map(d => d.color + 'cc'),
+                borderColor:     resultado.dimensiones.map(d => d.color),
+                borderWidth: 2,
+                borderRadius: 4
+              },
+              {
+                label: 'Puntuación máxima',
+                data: resultado.dimensiones.map(d => d.maxPonderado),
+                backgroundColor: resultado.dimensiones.map(() => '#e9eef4'),
+                borderColor:     resultado.dimensiones.map(() => '#c8d2e0'),
+                borderWidth: 1,
+                borderRadius: 4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom' },
+              tooltip: {
+                callbacks: {
+                  label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} pts`
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                suggestedMax: Math.max(...resultado.dimensiones.map(d => d.maxPonderado)) + 2,
+                title: { display: true, text: 'Puntos' }
+              }
+            }
+          }
+        });
+      } else if (window.CHARTJS_LOADED === false) {
+        // Chart.js no disponible — tabla de fallback
+        _tablaFallback(wrap, resultado);
+      } else {
+        // Todavía cargando — reintentar en 400 ms
+        setTimeout(intentar, 400);
+      }
+    };
+
+    intentar();
+  }
+
+  function _tablaFallback(contenedor, resultado) {
+    let html = `
+      <table class="chart-fallback-table">
+        <thead>
+          <tr>
+            <th>Dimensión</th>
+            <th>Puntuación</th>
+            <th>Máximo</th>
+            <th>% Riesgo</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    resultado.dimensiones.forEach(d => {
+      html += `
+          <tr>
+            <td style="color:${d.color};font-weight:600">${d.nombre}</td>
+            <td>${d.puntuacion.toFixed(2)}</td>
+            <td>${d.maxPonderado}</td>
+            <td>${d.porcentaje}%</td>
+          </tr>`;
+    });
+    html += `</tbody></table>`;
+    contenedor.innerHTML = html;
+  }
+
+  /* ═══════════════════════════════════════════════
+   * VI. PANTALLA 7 — INFORME
+   * ═══════════════════════════════════════════════ */
+
+  function _renderizarInforme() {
+    const seccion = document.getElementById('screen7');
+    if (!seccion) return;
+
+    const resultado = estado.ultimoResultado || MGRPICScoring.calcular(estado.respuestas);
+    const htmlInforme = MGRPICReport.generar(estado.datosCaso, resultado, ORIENTACIONES);
+
+    seccion.innerHTML = `
+      <div class="screen-container">
+        <div class="screen-header">
+          <div class="screen-step-badge">Paso 7 de ${TOTAL_PASOS} — Informe final</div>
+          <h2 class="screen-title">Informe MGRPIC</h2>
+          <p class="screen-desc">
+            Informe completo listo para incorporar al acta de intervención o trasladar al Juez de Instrucción.
+          </p>
+        </div>
+
+        <div class="report-actions">
+          <button class="btn btn-print" onclick="App.imprimirInforme()">
+            🖨 Imprimir / Guardar PDF
+          </button>
+          <button class="btn btn-secondary" onclick="App.irA(6)">← Volver a resultados</button>
+          <button class="btn btn-secondary" onclick="App.nuevaEvaluacion()">↺ Nueva evaluación</button>
+        </div>
+
+        <div class="report-body" id="reportBody">
+          ${htmlInforme}
+        </div>
+
+        <div class="report-actions" style="padding-top: var(--gap-sm); border-top: 1px solid var(--color-border)">
+          <button class="btn btn-print" onclick="App.imprimirInforme()">
+            🖨 Imprimir / Guardar PDF
+          </button>
+          <button class="btn btn-secondary" onclick="App.nuevaEvaluacion()">↺ Nueva evaluación</button>
+        </div>
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════════
+   * VII. IMPRESIÓN
+   * ═══════════════════════════════════════════════ */
+
+  /**
+   * Copia el contenido del informe a la zona de impresión (oculta en pantalla,
+   * visible solo al imprimir) y abre el diálogo del navegador.
+   */
+  function imprimirInforme() {
+    const reportBody = document.getElementById('reportBody');
+    const printZone  = document.getElementById('printZone');
+    if (!reportBody || !printZone) return;
+    printZone.innerHTML = reportBody.innerHTML;
+    window.print();
+  }
+
+  /* ═══════════════════════════════════════════════
+   * VIII. NUEVA EVALUACIÓN
+   * ═══════════════════════════════════════════════ */
+
+  /**
+   * Reinicia completamente el estado de la aplicación y vuelve a la pantalla de inicio.
+   * Las pantallas de dimensiones se vuelven a generar para limpiar los radio buttons.
+   */
+  function nuevaEvaluacion() {
+    // Limpiar estado
+    estado.datosCaso      = {};
+    estado.respuestas     = {};
+    estado.ultimoResultado = null;
+
+    // Limpiar formulario de datos del caso
+    const form = document.getElementById('caseForm');
+    if (form) form.reset();
+
+    // Volver a renderizar las pantallas de dimensiones para limpiar radios y estilos
+    _renderizarPantallasDimensiones();
+
+    // Navegar a la pantalla de inicio
+    irA(0);
+  }
+
+  /* ═══════════════════════════════════════════════
+   * IX. CABECERA Y BARRA DE PROGRESO
+   * ═══════════════════════════════════════════════ */
+
+  function _actualizarCabecera(numeroPantalla) {
+    const progressWrap = document.getElementById('headerProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressLabel = document.getElementById('progressLabel');
+
+    if (!progressWrap || !progressFill || !progressLabel) return;
+
+    if (numeroPantalla === 0) {
+      // Pantalla de inicio: ocultar barra
+      progressWrap.style.display = 'none';
+    } else {
+      progressWrap.style.display = 'flex';
+
+      // Progreso: pantalla 1 = paso 1/7, ..., pantalla 7 = paso 7/7
+      const paso = numeroPantalla;
+      const pct  = Math.round((paso / TOTAL_PASOS) * 100);
+      progressFill.style.width = pct + '%';
+      progressLabel.textContent = `Paso ${paso} de ${TOTAL_PASOS}`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════
+   * X. UTILIDADES INTERNAS
+   * ═══════════════════════════════════════════════ */
+
+  /**
+   * Genera un color de fondo claro a partir de un color hex (añade opacidad 15%).
+   * Se usa para los badges de los indicadores.
+   * @param {string} hex - Color en formato #rrggbb.
+   * @returns {string} Color rgba.
+   */
+  function _colorClaro(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},0.12)`;
+  }
+
+  /* ─────────────────────────────────────────────
+   * ARRANQUE DE LA APLICACIÓN
+   * ───────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', init);
+
+  // API pública
+  return {
+    irA,
+    guardarCasoEIrA,
+    validarDimensionEIrA,
+    registrarRespuesta,
+    imprimirInforme,
+    nuevaEvaluacion
+  };
+
+})();
+  </script>
+
+  <!-- Chart.js desde CDN con detección de fallo -->
+  <script>
+    (function() {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+      s.onload  = function() { window.CHARTJS_LOADED = true; };
+      s.onerror = function() { window.CHARTJS_LOADED = false; };
+      document.head.appendChild(s);
+    })();
+  </script>
+
+</body>
+</html>
