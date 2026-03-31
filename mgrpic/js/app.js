@@ -56,6 +56,13 @@ const App = (() => {
   const TOTAL_PASOS = 7; // pasos numerados 1-7 (pantallas 1-7)
 
   /* ─────────────────────────────────────────────
+   * Control de la instancia Chart.js para evitar
+   * duplicados al navegar varias veces a pantalla 6.
+   * ───────────────────────────────────────────── */
+  let _chartInstance    = null; // instancia activa de Chart.js
+  let _chartRetryTimer  = null; // ID del setTimeout de reintento de carga
+
+  /* ─────────────────────────────────────────────
    * ORIENTACIONES OPERATIVAS POR NIVEL DE RIESGO
    * ───────────────────────────────────────────── */
   const ORIENTACIONES = {
@@ -519,17 +526,23 @@ const App = (() => {
    * o una tabla de fallback si no hay conexión.
    */
   function _intentarGraficoBarras(resultado) {
-    const wrap = document.getElementById('chartWrap');
-    if (!wrap) return;
+    // Cancelar reintento pendiente anterior y destruir chart previo
+    if (_chartRetryTimer) { clearTimeout(_chartRetryTimer); _chartRetryTimer = null; }
+    if (_chartInstance)   { _chartInstance.destroy(); _chartInstance = null; }
 
     const intentar = () => {
+      // Re-obtener el elemento en cada intento para evitar referencias obsoletas
+      const wrap = document.getElementById('chartWrap');
+      if (!wrap) return; // el usuario navegó a otra pantalla
+
       if (window.CHARTJS_LOADED && typeof Chart !== 'undefined') {
-        // Chart.js disponible
+        // Chart.js disponible — crear canvas y registrar la instancia
         const canvas = document.createElement('canvas');
         canvas.id = 'dimChart';
+        wrap.innerHTML = ''; // limpiar por si hubo un intento previo parcial
         wrap.appendChild(canvas);
 
-        new Chart(canvas, {
+        _chartInstance = new Chart(canvas, {
           type: 'bar',
           data: {
             labels: resultado.dimensiones.map(d => d.nombre),
@@ -571,12 +584,13 @@ const App = (() => {
             }
           }
         });
+
       } else if (window.CHARTJS_LOADED === false) {
-        // Chart.js no disponible — tabla de fallback
+        // Chart.js no disponible — mostrar tabla de fallback
         _tablaFallback(wrap, resultado);
       } else {
-        // Todavía cargando — reintentar en 400 ms
-        setTimeout(intentar, 400);
+        // Todavía cargando — reintentar en 400 ms guardando el ID del timer
+        _chartRetryTimer = setTimeout(intentar, 400);
       }
     };
 
@@ -675,10 +689,19 @@ const App = (() => {
    * Las pantallas de dimensiones se vuelven a generar para limpiar los radio buttons.
    */
   function nuevaEvaluacion() {
+    // Destruir instancia Chart.js activa si la hay
+    if (_chartInstance) { _chartInstance.destroy(); _chartInstance = null; }
+    if (_chartRetryTimer) { clearTimeout(_chartRetryTimer); _chartRetryTimer = null; }
+
+    // Ocultar la pantalla actual antes de limpiar el estado para evitar parpadeo
+    const pantallaActiva = document.getElementById('screen' + estado.pantallaActual);
+    if (pantallaActiva) pantallaActiva.classList.add('hidden');
+
     // Limpiar estado
-    estado.datosCaso      = {};
-    estado.respuestas     = {};
+    estado.datosCaso       = {};
+    estado.respuestas      = {};
     estado.ultimoResultado = null;
+    estado.pantallaActual  = 0;
 
     // Limpiar formulario de datos del caso
     const form = document.getElementById('caseForm');

@@ -256,9 +256,9 @@ const MGRPICReport = (() => {
             Nivel de Riesgo: ${nivel.nivel} (${_pts(resultado.total)} puntos)
           </strong>
         </div>
-        <ul style="list-style:none; display:flex; flex-direction:column; gap:0.5rem;">
+        <ol style="padding-left:1.4rem; display:flex; flex-direction:column; gap:0.5rem;">
           ${oriList}
-        </ul>
+        </ol>
       </div>`;
 
     // ── 7. Pie de documento ───────────────────────────────────────────────
@@ -269,7 +269,7 @@ const MGRPICReport = (() => {
           <div>
             <strong style="color:#4a5e72">Herramienta:</strong> ${MGRPIC_DATA.acronimo} v${MGRPIC_DATA.version}<br>
             <strong style="color:#4a5e72">Fecha de generación:</strong> ${ahora}<br>
-            <strong style="color:#4a5e72">Completitud:</strong> ${resultado.completo ? 'Evaluación completa (15/15 indicadores)' : `Evaluación parcial (${15 - resultado.pendientes}/15 indicadores)`}
+            <strong style="color:#4a5e72">Completitud:</strong> ${resultado.completo ? `Evaluación completa (${MGRPICScoring.totalIndicadores()}/${MGRPICScoring.totalIndicadores()} indicadores)` : `Evaluación parcial (${MGRPICScoring.totalIndicadores() - resultado.pendientes}/${MGRPICScoring.totalIndicadores()} indicadores)`}
           </div>
           <div style="text-align:right; font-style:italic; line-height:1.6;">
             Los resultados tienen carácter orientativo.<br>
