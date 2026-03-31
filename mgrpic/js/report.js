@@ -96,9 +96,20 @@ const MGRPICReport = (() => {
                       text-transform:uppercase; color:#7a90a4; margin-bottom:0.3rem;">
             ${MGRPIC_DATA.acronimo} · Versión ${MGRPIC_DATA.version}
           </div>
-          <div style="font-size:1.6rem; font-weight:800; color:#1a3a5c;
-                      letter-spacing:0.04em; text-transform:uppercase; line-height:1.2;">
-            Informe de Evaluación MGRPIC
+          <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-bottom:0.2rem;">
+            <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" width="40" height="40" aria-hidden="true">
+              <polygon points="28,3 51,15.5 51,40.5 28,53 5,40.5 5,15.5" fill="#1F3864"/>
+              <line x1="28" y1="18" x2="18" y2="35" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+              <line x1="28" y1="18" x2="38" y2="35" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+              <line x1="18" y1="35" x2="38" y2="35" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="28" cy="18" r="4.5" fill="white"/>
+              <circle cx="18" cy="35" r="4.5" fill="white"/>
+              <circle cx="38" cy="35" r="4.5" fill="white"/>
+            </svg>
+            <div style="font-size:1.6rem; font-weight:800; color:#1F3864;
+                        letter-spacing:0.04em; text-transform:uppercase; line-height:1.2;">
+              Informe de Evaluación MGRPIC
+            </div>
           </div>
           <div style="font-size:0.78rem; font-weight:600; color:#4a5e72;
                       text-transform:uppercase; letter-spacing:0.08em;

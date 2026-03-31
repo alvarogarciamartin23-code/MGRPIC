@@ -56,11 +56,18 @@ const App = (() => {
   const TOTAL_PASOS = 7; // pasos numerados 1-7 (pantallas 1-7)
 
   /* ─────────────────────────────────────────────
-   * Control de la instancia Chart.js para evitar
-   * duplicados al navegar varias veces a pantalla 6.
+   * LOGO SVG — hexágono institucional con red blockchain
+   * Se reutiliza en cabecera, pantalla de inicio e informe.
    * ───────────────────────────────────────────── */
-  let _chartInstance    = null; // instancia activa de Chart.js
-  let _chartRetryTimer  = null; // ID del setTimeout de reintento de carga
+  const LOGO_SVG = `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <polygon points="28,3 51,15.5 51,40.5 28,53 5,40.5 5,15.5" fill="#1F3864"/>
+    <line x1="28" y1="18" x2="18" y2="35" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="28" y1="18" x2="38" y2="35" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="18" y1="35" x2="38" y2="35" stroke="rgba(255,255,255,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="28" cy="18" r="4.5" fill="white"/>
+    <circle cx="18" cy="35" r="4.5" fill="white"/>
+    <circle cx="38" cy="35" r="4.5" fill="white"/>
+  </svg>`;
 
   /* ─────────────────────────────────────────────
    * ORIENTACIONES: referencia al objeto definido en scoring.js.
@@ -412,6 +419,30 @@ const App = (() => {
     const orientacion = ORIENTACIONES[nivel.nivel] || [];
     const orientacionHtml = orientacion.map(p => `<li>${p}</li>`).join('');
 
+    // Top 3 indicadores con mayor puntuación
+    const todosInd = [];
+    resultado.dimensiones.forEach(dim => {
+      dim.indicadores.forEach(ind => todosInd.push({ ...ind, dimColor: dim.color }));
+    });
+    const top3 = todosInd.filter(i => i.valor > 0).sort((a, b) => b.valor - a.valor).slice(0, 3);
+    const coloresNivelTop3 = { 'Alto': '#a04800', 'Moderado': '#7d5c00', 'Bajo': '#3d7020' };
+    const top3Html = top3.length === 0
+      ? '<p style="font-size:0.85rem;color:#7a90a4;padding:0.5rem 0;">Todos los indicadores están en nivel Bajo.</p>'
+      : top3.map((ind, i) => `
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;
+                    border-bottom:1px solid #ecf0f4;">
+          <span style="font-size:1.1rem;font-weight:800;color:#bfc9d8;min-width:1.4rem;">${i+1}</span>
+          <div style="flex:1;">
+            <div style="font-size:0.86rem;font-weight:600;color:#2c3e50;">${ind.nombre}</div>
+            <div style="font-size:0.76rem;color:${ind.dimColor};margin-top:0.1rem;">${ind.codigo}</div>
+          </div>
+          <span style="font-size:0.76rem;font-weight:700;padding:2px 8px;border-radius:3px;
+                       background:${ind.nivel==='Alto'?'#fff0d9':'#fff8cc'};
+                       color:${coloresNivelTop3[ind.nivel]||'#4a5e72'}">
+            ${ind.nivel} (${ind.valor})
+          </span>
+        </div>`).join('');
+
     // Desglose por dimensiones
     const desgloseRows = resultado.dimensiones.map(dim => {
       const pct = Math.round((dim.puntuacion / dim.maxPonderado) * 100);
@@ -456,12 +487,16 @@ const App = (() => {
           </div>
         </div>
 
-        <!-- Gráfico / desglose -->
+        <!-- Gráfico SVG de barras (sin dependencias externas) -->
         <div class="chart-container">
           <div class="dim-breakdown-title">Desglose por dimensión</div>
-          <div id="chartWrap">
-            <!-- Chart.js se inyecta aquí si está disponible; si no, tabla de fallback -->
-          </div>
+          <div id="chartWrap">${_graficoSVG(resultado)}</div>
+        </div>
+
+        <!-- Top 3 indicadores críticos -->
+        <div class="dim-breakdown">
+          <div class="dim-breakdown-title">Factores de mayor riesgo</div>
+          <div style="padding:0 var(--gap-md) var(--gap-sm);">${top3Html}</div>
         </div>
 
         <!-- Tabla de desglose detallado -->
@@ -486,109 +521,82 @@ const App = (() => {
         </div>
       </div>`;
 
-    // Intentar renderizar gráfico con Chart.js
-    _intentarGraficoBarras(resultado);
+    // Animar la puntuación (contador de 0 al valor final)
+    const scoreEl = seccion.querySelector('.results-score-number');
+    if (scoreEl) _animarPuntuacion(scoreEl, resultado.total);
   }
 
   /**
-   * Renderiza el gráfico de barras con Chart.js si está disponible,
-   * o una tabla de fallback si no hay conexión.
+   * Genera un gráfico de barras SVG sin dependencias externas.
+   * Muestra las puntuaciones obtenidas vs máximas de cada dimensión.
+   * @param {object} resultado - Resultado de MGRPICScoring.calculateScore().
+   * @returns {string} HTML con el elemento <svg>.
    */
-  function _intentarGraficoBarras(resultado) {
-    // Cancelar reintento pendiente anterior y destruir chart previo
-    if (_chartRetryTimer) { clearTimeout(_chartRetryTimer); _chartRetryTimer = null; }
-    if (_chartInstance)   { _chartInstance.destroy(); _chartInstance = null; }
+  function _graficoSVG(resultado) {
+    const dims   = resultado.dimensiones;
+    const W      = 480;
+    const H      = 190;
+    const padT   = 28;
+    const padB   = 52;
+    const padL   = 36;
+    const padR   = 16;
+    const chartH = H - padT - padB;
+    const chartW = W - padL - padR;
+    const maxVal = Math.max(...dims.map(d => d.maxPonderado));
+    const slotW  = chartW / dims.length;
+    const barW   = Math.min(52, slotW * 0.55);
 
-    const intentar = () => {
-      // Re-obtener el elemento en cada intento para evitar referencias obsoletas
-      const wrap = document.getElementById('chartWrap');
-      if (!wrap) return; // el usuario navegó a otra pantalla
+    const elems = dims.map((dim, i) => {
+      const cx   = padL + slotW * i + slotW / 2;
+      const x    = cx - barW / 2;
+      const hMax = chartH;
+      const hVal = Math.max(2, (dim.puntuacion / maxVal) * chartH);
+      const yMax = padT;
+      const yVal = padT + (hMax - hVal);
+      const pct  = dim.porcentaje;
+      return `
+        <rect x="${x.toFixed(1)}" y="${yMax}" width="${barW}" height="${hMax}" fill="#ebebeb" rx="3"/>
+        <rect x="${x.toFixed(1)}" y="${yVal.toFixed(1)}" width="${barW}" height="${hVal.toFixed(1)}" fill="${dim.color}" rx="3"/>
+        <text x="${cx.toFixed(1)}" y="${(yVal - 5).toFixed(1)}" text-anchor="middle"
+              font-size="11" font-weight="700" fill="${dim.color}">${dim.puntuacion.toFixed(1)}</text>
+        <text x="${cx.toFixed(1)}" y="${(H - padB + 16).toFixed(1)}" text-anchor="middle"
+              font-size="10" font-weight="600" fill="#4a5e72">${dim.id}</text>
+        <text x="${cx.toFixed(1)}" y="${(H - padB + 28).toFixed(1)}" text-anchor="middle"
+              font-size="8.5" fill="#7a90a4">${pct}%</text>
+        <text x="${cx.toFixed(1)}" y="${(H - padB + 39).toFixed(1)}" text-anchor="middle"
+              font-size="8" fill="#bfc9d8">/${dim.maxPonderado}</text>`;
+    }).join('');
 
-      if (window.CHARTJS_LOADED && typeof Chart !== 'undefined') {
-        // Chart.js disponible — crear canvas y registrar la instancia
-        const canvas = document.createElement('canvas');
-        canvas.id = 'dimChart';
-        wrap.innerHTML = ''; // limpiar por si hubo un intento previo parcial
-        wrap.appendChild(canvas);
+    // Línea de eje Y y etiquetas
+    const axis = `
+      <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + chartH}"
+            stroke="#dde3ec" stroke-width="1"/>
+      <text x="${padL - 4}" y="${padT + 4}" text-anchor="end" font-size="8" fill="#bfc9d8">${maxVal}</text>
+      <text x="${padL - 4}" y="${padT + chartH}" text-anchor="end" font-size="8" fill="#bfc9d8">0</text>`;
 
-        _chartInstance = new Chart(canvas, {
-          type: 'bar',
-          data: {
-            labels: resultado.dimensiones.map(d => d.nombre),
-            datasets: [
-              {
-                label: 'Puntuación obtenida',
-                data: resultado.dimensiones.map(d => d.puntuacion),
-                backgroundColor: resultado.dimensiones.map(d => d.color + 'cc'),
-                borderColor:     resultado.dimensiones.map(d => d.color),
-                borderWidth: 2,
-                borderRadius: 4
-              },
-              {
-                label: 'Puntuación máxima',
-                data: resultado.dimensiones.map(d => d.maxPonderado),
-                backgroundColor: resultado.dimensiones.map(() => '#e9eef4'),
-                borderColor:     resultado.dimensiones.map(() => '#c8d2e0'),
-                borderWidth: 1,
-                borderRadius: 4
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { position: 'bottom' },
-              tooltip: {
-                callbacks: {
-                  label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} pts`
-                }
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                suggestedMax: Math.max(...resultado.dimensiones.map(d => d.maxPonderado)) + 2,
-                title: { display: true, text: 'Puntos' }
-              }
-            }
-          }
-        });
-
-      } else if (window.CHARTJS_LOADED === false) {
-        // Chart.js no disponible — mostrar tabla de fallback
-        _tablaFallback(wrap, resultado);
-      } else {
-        // Todavía cargando — reintentar en 400 ms guardando el ID del timer
-        _chartRetryTimer = setTimeout(intentar, 400);
-      }
-    };
-
-    intentar();
+    return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"
+                 style="width:100%;max-height:${H}px;font-family:var(--font-main)"
+                 role="img" aria-label="Gráfico de barras por dimensión">
+      ${axis}${elems}
+    </svg>`;
   }
 
-  function _tablaFallback(contenedor, resultado) {
-    let html = `
-      <table class="chart-fallback-table">
-        <thead>
-          <tr>
-            <th>Dimensión</th>
-            <th>Puntuación</th>
-            <th>Máximo</th>
-            <th>% Riesgo</th>
-          </tr>
-        </thead>
-        <tbody>`;
-    resultado.dimensiones.forEach(d => {
-      html += `
-          <tr>
-            <td style="color:${d.color};font-weight:600">${d.nombre}</td>
-            <td>${d.puntuacion.toFixed(2)}</td>
-            <td>${d.maxPonderado}</td>
-            <td>${d.porcentaje}%</td>
-          </tr>`;
-    });
-    html += `</tbody></table>`;
-    contenedor.innerHTML = html;
+  /**
+   * Anima el número de puntuación desde 0 hasta el valor final con ease-out cúbico.
+   * @param {HTMLElement} el - Elemento que muestra la puntuación.
+   * @param {number} valorFinal - Puntuación final.
+   */
+  function _animarPuntuacion(el, valorFinal) {
+    const duracion = 900;
+    const inicio   = performance.now();
+    const tick = (ahora) => {
+      const t    = Math.min((ahora - inicio) / duracion, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = (valorFinal * ease).toFixed(1);
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = valorFinal.toFixed(1);
+    };
+    requestAnimationFrame(tick);
   }
 
   /* ═══════════════════════════════════════════════
@@ -615,6 +623,9 @@ const App = (() => {
         <div class="report-actions">
           <button class="btn btn-print" onclick="App.imprimirInforme()">
             🖨 Imprimir / Guardar PDF
+          </button>
+          <button class="btn btn-secondary" id="btnCopiar" onclick="App.copiarInforme()">
+            📋 Copiar texto
           </button>
           <button class="btn btn-secondary" onclick="App.irA(6)">← Volver a resultados</button>
           <button class="btn btn-secondary" onclick="App.nuevaEvaluacion()">↺ Nueva evaluación</button>
@@ -649,6 +660,37 @@ const App = (() => {
     window.print();
   }
 
+  /**
+   * Copia el texto plano del informe al portapapeles del sistema.
+   * Actualiza el botón temporalmente como confirmación visual.
+   */
+  function copiarInforme() {
+    const reportBody = document.getElementById('reportBody');
+    if (!reportBody) return;
+    const texto = reportBody.innerText;
+    const btn = document.getElementById('btnCopiar');
+
+    const confirmar = () => {
+      if (btn) { btn.textContent = '✓ Copiado'; setTimeout(() => { btn.textContent = '📋 Copiar texto'; }, 2200); }
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(confirmar).catch(() => _copiarFallback(texto, confirmar));
+    } else {
+      _copiarFallback(texto, confirmar);
+    }
+  }
+
+  function _copiarFallback(texto, cb) {
+    const ta = document.createElement('textarea');
+    ta.value = texto;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
   /* ═══════════════════════════════════════════════
    * VIII. NUEVA EVALUACIÓN
    * ═══════════════════════════════════════════════ */
@@ -658,9 +700,6 @@ const App = (() => {
    * Las pantallas de dimensiones se vuelven a generar para limpiar los radio buttons.
    */
   function nuevaEvaluacion() {
-    // Destruir instancia Chart.js activa si la hay
-    if (_chartInstance) { _chartInstance.destroy(); _chartInstance = null; }
-    if (_chartRetryTimer) { clearTimeout(_chartRetryTimer); _chartRetryTimer = null; }
 
     // Ocultar la pantalla actual antes de limpiar el estado para evitar parpadeo
     const pantallaActiva = document.getElementById('screen' + estado.pantallaActual);
@@ -737,6 +776,7 @@ const App = (() => {
     validarDimensionEIrA,
     registrarRespuesta,
     imprimirInforme,
+    copiarInforme,
     nuevaEvaluacion
   };
 
