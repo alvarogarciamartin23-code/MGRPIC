@@ -3,32 +3,99 @@
  *
  * Completamente independiente de la interfaz de usuario.
  * Recibe el objeto de respuestas del usuario y devuelve puntuaciones
- * detalladas por dimensión y la puntuación total ponderada (escala 0-100).
+ * detalladas por dimensión, la puntuación total ponderada (escala 0-100),
+ * el nivel de riesgo y la orientación operativa correspondiente.
  *
- * Fórmulas aplicadas (conforme a data.js):
- *   Dim I  (Volatilidad)              = (V1+V2+V3+V4) × 4.375   → máx. 35 pts
- *   Dim II (Custodia)                 = (C1+C2+C3+C4) × 3.125   → máx. 25 pts
- *   Dim III (Inejecutabilidad)        = (I1+I2+I3+I4) × 3.125   → máx. 25 pts
- *   Dim IV (Riesgo Jurídico-Procesal) = (J1+J2+J3)    × 2.5     → máx. 15 pts
+ * FÓRMULAS DE CÁLCULO (Paso 2):
+ *   Dim I  — Volatilidad              = (V1+V2+V3+V4) × 4.375   → máx. 35 pts
+ *   Dim II — Custodia                 = (C1+C2+C3+C4) × 3.125   → máx. 25 pts
+ *   Dim III — Inejecutabilidad        = (I1+I2+I3+I4) × 3.125   → máx. 25 pts
+ *   Dim IV — Riesgo Jurídico-Procesal = (J1+J2+J3)    × 2.5     → máx. 15 pts
  *   TOTAL = Dim I + Dim II + Dim III + Dim IV          → escala 0-100
  *
- * Uso:
- *   const resultado = MGRPICScoring.calcular(respuestas);
+ * VERIFICACIÓN: suma de máximos ponderados = 35 + 25 + 25 + 15 = 100 puntos ✓
+ *
+ * API pública:
+ *   MGRPICScoring.calculateScore(respuestas)      → resultado completo con orientación
+ *   MGRPICScoring.validateAnswers(respuestas)      → validación con detalle de pendientes
+ *   MGRPICScoring.calcular(respuestas)             → alias de calculateScore (sin orientación)
+ *   MGRPICScoring.totalIndicadores()               → número total de indicadores (15)
+ *   MGRPICScoring.indicadoresRespondidos(resp)     → cuántos han sido respondidos
+ *   MGRPICScoring.porcentajeCompletitud(resp)      → % de completitud (0-100)
+ *   MGRPICScoring.ORIENTACIONES                    → textos de orientación por nivel
  *
  * Formato de entrada `respuestas`:
- *   Objeto plano con claves = id del indicador y valores = número (0, 1 o 2).
- *   Ejemplo: { V1: 1, V2: 0, V3: 2, V4: 1, C1: 0, ... }
+ *   Objeto plano: { V1: 0, V2: 1, V3: 2, V4: 1, C1: 0, ... }
+ *   Valores permitidos por indicador: 0 (Bajo), 1 (Moderado), 2 (Alto).
  *
- * Formato de salida:
+ * Formato de salida de calculateScore():
  *   {
- *     dimensiones: [ { id, nombre, sumaBruta, maxBruto, puntuacion, maxPonderado, porcentaje, indicadores: [...] } ],
- *     total:       número (0-100, dos decimales),
- *     nivelRiesgo: { nivel, min, max, color, colorClaro, descripcion },
- *     completo:    boolean (true si todos los indicadores tienen respuesta)
+ *     dimensiones:  [ { id, codigo, nombre, peso, factor, color, sumaBruta, maxBruto,
+ *                       puntuacion, maxPonderado, porcentaje, indicadores: [...] } ],
+ *     total:        number   (0-100, dos decimales),
+ *     nivelRiesgo:  { nivel, min, max, color, colorClaro, descripcion },
+ *     orientacion:  string[] (lista de recomendaciones operativas),
+ *     completo:     boolean  (true si los 15 indicadores tienen respuesta),
+ *     pendientes:   number   (indicadores sin responder)
+ *   }
+ *
+ * Formato de salida de validateAnswers():
+ *   {
+ *     valido:       boolean,
+ *     respondidos:  number,
+ *     total:        number,
+ *     porcentaje:   number,
+ *     faltantes:    [ { id, codigo, nombre, dimension } ]  (vacío si valido === true)
  *   }
  */
 
 const MGRPICScoring = (() => {
+
+  /* ═══════════════════════════════════════════════════════════
+   * ORIENTACIONES OPERATIVAS POR NIVEL DE RIESGO
+   * Textos de recomendación que se incluyen en el informe final.
+   * ═══════════════════════════════════════════════════════════ */
+  const ORIENTACIONES = {
+
+    "BAJO": [
+      "Mantener la custodia ordinaria de los criptoactivos con las medidas actualmente adoptadas.",
+      "Documentar el estado de la custodia en el acta de intervención y verificar periódicamente el saldo en blockchain.",
+      "No se aprecia necesidad de actuación urgente. Continuar el procedimiento con la tramitación habitual.",
+      "Informar al Juez de Instrucción del estado de la incautación con periodicidad trimestral o ante cualquier variación significativa de valor."
+    ],
+
+    "MODERADO": [
+      "Revisar los indicadores con puntuación Moderado o Alto e identificar las deficiencias subsanables a corto plazo.",
+      "Valorar la conveniencia de elevar propuesta al Juez de Instrucción para la adopción de medidas cautelares preventivas.",
+      "Reforzar la cadena de custodia documentando formalmente todos los accesos y verificaciones periódicas.",
+      "Considerar la contratación de custodio institucional especializado si la duración estimada del proceso supera los 12 meses.",
+      "Documentar el contravalor en euros de los activos con periodicidad mensual para acreditar la variación de valor."
+    ],
+
+    "ALTO": [
+      "Elevar propuesta motivada al Juez de Instrucción para la adopción urgente de medidas sobre los criptoactivos.",
+      "Solicitar autorización judicial para la contratación de custodio institucional especializado (Prosegur Crypto u ORGA).",
+      "Considerar la enajenación anticipada de los activos si la volatilidad o el riesgo de pérdida son determinantes.",
+      "Realizar verificación inmediata del saldo en blockchain y documentar el estado actual de la custodia.",
+      "Iniciar diligencias para obtener o asegurar las claves privadas si no están bajo control policial.",
+      "Informar al Ministerio Fiscal de la situación para que valore el ejercicio de acciones cautelares adicionales."
+    ],
+
+    "CRÍTICO": [
+      "ACTUACIÓN INMEDIATA IMPRESCINDIBLE. El riesgo de pérdida o frustración del decomiso es máximo.",
+      "Solicitar con carácter urgente (art. 367 ter LECrim) autorización judicial para enajenación anticipada o conversión a moneda fiat.",
+      "Si los activos están en exchanges, requerir con carácter urgente el bloqueo de las cuentas del investigado.",
+      "Contactar con la Unidad de Decomiso y Gestión de Activos del Ministerio de Justicia para activar el protocolo de actuación.",
+      "Elevar informe al Juez de Instrucción con la presente valoración de riesgo como soporte documental de la urgencia.",
+      "Registrar con carácter inmediato toda incidencia en el acta de incautación para preservar la responsabilidad institucional.",
+      "Valorar la solicitud de perito forense especializado en blockchain si la trazabilidad de los activos está comprometida."
+    ]
+
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+   * FUNCIONES INTERNAS
+   * ═══════════════════════════════════════════════════════════ */
 
   /**
    * Determina el nivel de riesgo global según la puntuación total.
@@ -39,26 +106,35 @@ const MGRPICScoring = (() => {
     for (const nivel of MGRPIC_DATA.escalaRiesgo) {
       if (total >= nivel.min && total <= nivel.max) return nivel;
     }
-    // Fallback al último nivel si total == 100 exacto
+    // Fallback: devolver el último nivel (CRÍTICO) si total === 100 exacto
     return MGRPIC_DATA.escalaRiesgo[MGRPIC_DATA.escalaRiesgo.length - 1];
   }
 
+  /* ═══════════════════════════════════════════════════════════
+   * API PÚBLICA
+   * ═══════════════════════════════════════════════════════════ */
+
   /**
-   * Calcula las puntuaciones completas a partir de las respuestas del usuario.
+   * Calcula la puntuación completa de la evaluación MGRPIC.
+   *
+   * Aplica las cuatro fórmulas ponderadas y devuelve el resultado
+   * detallado incluyendo la orientación operativa para el nivel obtenido.
+   *
    * @param {object} respuestas - { indicadorId: valor (0|1|2), ... }
-   * @returns {object} Resultado detallado (ver cabecera del archivo).
+   * @returns {object} Resultado completo (ver cabecera del archivo).
    */
-  function calcular(respuestas) {
+  function calculateScore(respuestas) {
     respuestas = respuestas || {};
 
-    let totalPuntuacion = 0;
+    let totalPuntuacion      = 0;
     let indicadoresPendientes = 0;
 
     const resultadoDimensiones = MGRPIC_DATA.dimensiones.map(dim => {
 
       let sumaBruta = 0;
+
       const resultadoIndicadores = dim.indicadores.map(ind => {
-        const valor = respuestas[ind.id];
+        const valor     = respuestas[ind.id];
         const respondido = (valor !== undefined && valor !== null && valor !== '');
 
         if (!respondido) {
@@ -67,27 +143,33 @@ const MGRPICScoring = (() => {
           sumaBruta += Number(valor);
         }
 
-        // Recuperar la opción seleccionada para mostrar su etiqueta en el informe
-        const opcionSeleccionada = respondido
-          ? ind.opciones.find(o => o.valor === Number(valor)) || null
+        // Localizar la opción elegida para incluir su etiqueta en el informe
+        const opcion = respondido
+          ? (ind.opciones.find(o => o.valor === Number(valor)) || null)
           : null;
 
         return {
-          id:               ind.id,
-          codigo:           ind.codigo,
-          nombre:           ind.nombre,
-          valor:            respondido ? Number(valor) : null,
-          respondido:       respondido,
-          nivel:            opcionSeleccionada ? opcionSeleccionada.nivel    : null,
-          etiquetaElegida:  opcionSeleccionada ? opcionSeleccionada.etiqueta : null
+          id:              ind.id,
+          codigo:          ind.codigo,
+          nombre:          ind.nombre,
+          valor:           respondido ? Number(valor) : null,
+          respondido:      respondido,
+          nivel:           opcion ? opcion.nivel    : null,
+          etiquetaElegida: opcion ? opcion.etiqueta : null
         };
       });
 
-      // Puntuación ponderada de la dimensión
-      const puntuacion = parseFloat((sumaBruta * dim.factor).toFixed(4));
+      // ── Aplicar fórmula ponderada de la dimensión ──────────────────────
+      //   Dim I   = sumaBruta × 4.375  (máx.  8 × 4.375 = 35)
+      //   Dim II  = sumaBruta × 3.125  (máx.  8 × 3.125 = 25)
+      //   Dim III = sumaBruta × 3.125  (máx.  8 × 3.125 = 25)
+      //   Dim IV  = sumaBruta × 2.5    (máx.  6 × 2.5   = 15)
+      const puntuacion  = parseFloat((sumaBruta * dim.factor).toFixed(4));
 
-      // Porcentaje de riesgo dentro de la dimensión (0-100%)
-      const porcentaje = parseFloat(((sumaBruta / dim.maxBruto) * 100).toFixed(2));
+      // Porcentaje de riesgo dentro de la propia dimensión (0-100 %)
+      const porcentaje  = dim.maxBruto > 0
+        ? parseFloat(((sumaBruta / dim.maxBruto) * 100).toFixed(2))
+        : 0;
 
       totalPuntuacion += puntuacion;
 
@@ -98,29 +180,88 @@ const MGRPICScoring = (() => {
         peso:         dim.peso,
         factor:       dim.factor,
         color:        dim.color,
-        sumaBruta:    sumaBruta,
+        sumaBruta,
         maxBruto:     dim.maxBruto,
-        puntuacion:   puntuacion,
+        puntuacion,
         maxPonderado: dim.maxPonderado,
-        porcentaje:   porcentaje,      // % de riesgo en la dimensión
+        porcentaje,
         indicadores:  resultadoIndicadores
       };
     });
 
-    // Redondear el total a dos decimales
+    // Redondear el total a dos decimales para evitar aritmética flotante
     totalPuntuacion = parseFloat(totalPuntuacion.toFixed(2));
+
+    const nivelRiesgo = _nivelRiesgo(totalPuntuacion);
 
     return {
       dimensiones:  resultadoDimensiones,
       total:        totalPuntuacion,
-      nivelRiesgo:  _nivelRiesgo(totalPuntuacion),
+      nivelRiesgo,
+      orientacion:  ORIENTACIONES[nivelRiesgo.nivel] || [],
       completo:     indicadoresPendientes === 0,
       pendientes:   indicadoresPendientes
     };
   }
 
   /**
-   * Devuelve cuántos indicadores en total tiene la matriz.
+   * Valida que todos los indicadores hayan sido respondidos.
+   *
+   * Debe llamarse antes de permitir navegar a la pantalla de resultados.
+   * Devuelve el detalle completo de los indicadores pendientes para poder
+   * mostrarlos al usuario o bloquear el avance.
+   *
+   * @param {object} respuestas - { indicadorId: valor (0|1|2), ... }
+   * @returns {{
+   *   valido:      boolean,   — true si los 15 indicadores tienen respuesta
+   *   respondidos: number,    — indicadores con respuesta
+   *   total:       number,    — total de indicadores en la matriz (15)
+   *   porcentaje:  number,    — % de completitud (0-100)
+   *   faltantes:   Array<{id, codigo, nombre, dimension}>  — vacío si valido
+   * }}
+   */
+  function validateAnswers(respuestas) {
+    respuestas = respuestas || {};
+    const faltantes = [];
+
+    MGRPIC_DATA.dimensiones.forEach(dim => {
+      dim.indicadores.forEach(ind => {
+        const valor = respuestas[ind.id];
+        const respondido = (valor !== undefined && valor !== null && valor !== '');
+        if (!respondido) {
+          faltantes.push({
+            id:        ind.id,
+            codigo:    ind.codigo,
+            nombre:    ind.nombre,
+            dimension: dim.nombre
+          });
+        }
+      });
+    });
+
+    const total       = totalIndicadores();
+    const respondidos = total - faltantes.length;
+
+    return {
+      valido:      faltantes.length === 0,
+      respondidos,
+      total,
+      porcentaje:  total > 0 ? Math.round((respondidos / total) * 100) : 0,
+      faltantes
+    };
+  }
+
+  /**
+   * Alias de calculateScore() para compatibilidad con el código existente.
+   * @param {object} respuestas
+   * @returns {object}
+   */
+  function calcular(respuestas) {
+    return calculateScore(respuestas);
+  }
+
+  /**
+   * Devuelve cuántos indicadores en total tiene la matriz (debe ser 15).
    * @returns {number}
    */
   function totalIndicadores() {
@@ -128,21 +269,12 @@ const MGRPICScoring = (() => {
   }
 
   /**
-   * Devuelve cuántos indicadores han sido respondidos en un objeto de respuestas.
+   * Devuelve cuántos indicadores han sido respondidos.
    * @param {object} respuestas
    * @returns {number}
    */
   function indicadoresRespondidos(respuestas) {
-    respuestas = respuestas || {};
-    let count = 0;
-    MGRPIC_DATA.dimensiones.forEach(dim => {
-      dim.indicadores.forEach(ind => {
-        if (respuestas[ind.id] !== undefined && respuestas[ind.id] !== null && respuestas[ind.id] !== '') {
-          count++;
-        }
-      });
-    });
-    return count;
+    return validateAnswers(respuestas).respondidos;
   }
 
   /**
@@ -151,17 +283,20 @@ const MGRPICScoring = (() => {
    * @returns {number}
    */
   function porcentajeCompletitud(respuestas) {
-    const total = totalIndicadores();
-    if (total === 0) return 0;
-    return Math.round((indicadoresRespondidos(respuestas) / total) * 100);
+    return validateAnswers(respuestas).porcentaje;
   }
 
-  // API pública del módulo
+  /* ─────────────────────────────────────────────
+   * API pública del módulo MGRPICScoring
+   * ───────────────────────────────────────────── */
   return {
-    calcular,
+    calculateScore,
+    validateAnswers,
+    calcular,               // alias de calculateScore
     totalIndicadores,
     indicadoresRespondidos,
-    porcentajeCompletitud
+    porcentajeCompletitud,
+    ORIENTACIONES           // expuesto para uso externo (app.js, report.js)
   };
 
 })();

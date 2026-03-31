@@ -63,40 +63,10 @@ const App = (() => {
   let _chartRetryTimer  = null; // ID del setTimeout de reintento de carga
 
   /* ─────────────────────────────────────────────
-   * ORIENTACIONES OPERATIVAS POR NIVEL DE RIESGO
+   * ORIENTACIONES: referencia al objeto definido en scoring.js.
+   * scoring.js es la fuente única de verdad; aquí solo se reutiliza.
    * ───────────────────────────────────────────── */
-  const ORIENTACIONES = {
-    "BAJO": [
-      "Mantener la custodia ordinaria de los criptoactivos con las medidas actualmente adoptadas.",
-      "Documentar el estado de la custodia en el acta de intervención y verificar periódicamente el saldo en blockchain.",
-      "No se aprecia necesidad de actuación urgente. Continuar el procedimiento con la tramitación habitual.",
-      "Informar al Juez de Instrucción del estado de la incautación con periodicidad trimestral o ante cualquier variación significativa."
-    ],
-    "MODERADO": [
-      "Revisar los indicadores con puntuación Moderado o Alto e identificar las deficiencias subsanables a corto plazo.",
-      "Valorar la conveniencia de elevar propuesta al Juez de Instrucción para la adopción de medidas cautelares preventivas.",
-      "Reforzar la cadena de custodia documentando formalmente todos los accesos y verificaciones periódicas.",
-      "Considerar la contratación de custodio institucional especializado si la duración estimada del proceso supera los 12 meses.",
-      "Documentar el contravalor en euros de los activos con periodicidad mensual para acreditar la variación de valor."
-    ],
-    "ALTO": [
-      "Elevar propuesta motivada al Juez de Instrucción para la adopción urgente de medidas sobre los criptoactivos.",
-      "Solicitar autorización judicial para la contratación de custodio institucional especializado (Prosegur Crypto u ORGA).",
-      "Considerar la enajenación anticipada de los activos si la volatilidad o el riesgo de pérdida son determinantes.",
-      "Realizar verificación inmediata del saldo en blockchain y documentar el estado actual de la custodia.",
-      "Iniciar diligencias para obtener o asegurar las claves privadas si no están bajo control policial.",
-      "Informar al Ministerio Fiscal de la situación para que valore el ejercicio de acciones cautelares adicionales."
-    ],
-    "CRÍTICO": [
-      "ACTUACIÓN INMEDIATA IMPRESCINDIBLE. El riesgo de pérdida o frustración del decomiso es máximo.",
-      "Solicitar con carácter urgente (art. 367 ter LECrim) autorización judicial para enajenación anticipada o conversión a moneda fiat.",
-      "Si los activos están en exchanges, requerir con carácter urgente el bloqueo de las cuentas del investigado.",
-      "Contactar con la Unidad de Decomiso y Gestión de Activos del Ministerio de Justicia para activar el protocolo de actuación.",
-      "Elevar informe al Juez de Instrucción con la presente valoración de riesgo como soporte documental de la urgencia.",
-      "Registrar con carácter inmediato toda incidencia en el acta de incautación para preservar la responsabilidad institucional.",
-      "Valorar la solicitud de perito forense especializado en blockchain si la trazabilidad de los activos está comprometida."
-    ]
-  };
+  const ORIENTACIONES = MGRPICScoring.ORIENTACIONES;
 
   /* ═══════════════════════════════════════════════
    * I. INICIALIZACIÓN
@@ -245,24 +215,23 @@ const App = (() => {
     const dimIndex = PANTALLA_A_DIM[pantallaOrigen];
     if (dimIndex === undefined) { irA(destino); return; }
 
-    const dimension = MGRPIC_DATA.dimensiones[dimIndex];
-    let hayPendientes = false;
+    // Usar validateAnswers() para obtener el detalle de qué falta
+    const dimension   = MGRPIC_DATA.dimensiones[dimIndex];
+    const soloEstaDim = {};
+    dimension.indicadores.forEach(ind => {
+      soloEstaDim[ind.id] = estado.respuestas[ind.id];
+    });
+    const validacion = MGRPICScoring.validateAnswers(soloEstaDim);
 
+    // Actualizar clases visuales de cada tarjeta según el resultado
     dimension.indicadores.forEach(ind => {
       const card = document.getElementById('card-' + ind.id);
-      const valor = estado.respuestas[ind.id];
-      const pendiente = (valor === undefined || valor === null || valor === '');
-      if (card) {
-        if (pendiente) {
-          card.classList.add('sin-respuesta');
-          hayPendientes = true;
-        } else {
-          card.classList.remove('sin-respuesta');
-        }
-      }
+      if (!card) return;
+      const esFaltante = validacion.faltantes.some(f => f.id === ind.id);
+      card.classList.toggle('sin-respuesta', esFaltante);
     });
 
-    if (hayPendientes) {
+    if (!validacion.valido) {
       // Hacer scroll al primer indicador sin respuesta
       const primera = document.querySelector('.sin-respuesta');
       if (primera) primera.scrollIntoView({ behavior: 'smooth', block: 'center' });
