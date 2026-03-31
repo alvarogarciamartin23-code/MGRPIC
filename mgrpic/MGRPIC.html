@@ -8,8 +8,11 @@
 /* ═══════════════════════════════════════════════════════════
    styles.css — Hoja de estilos principal de la MGRPIC
    Diseño profesional e institucional. Sin dependencias externas.
-   Paleta: azul institucional oscuro + acentos por nivel de riesgo.
+   Paleta: azul institucional #1F3864 + niveles de riesgo PASO 6.
    ═══════════════════════════════════════════════════════════ */
+
+/* Tipografía Inter (Google Fonts, carga asíncrona) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* ──────────────────────────────────────────
    1. RESET Y VARIABLES GLOBALES
@@ -22,39 +25,43 @@
 
 :root {
   /* Paleta institucional */
-  --color-primario:       #1a3a5c;   /* azul oscuro */
-  --color-primario-med:   #1e4f7a;
-  --color-primario-claro: #2e6da4;
-  --color-acento:         #2980b9;
-  --color-acento-hover:   #1a6595;
+  --color-primario:       #1F3864;   /* azul oscuro institucional */
+  --color-primario-med:   #2a4a80;
+  --color-primario-claro: #3a6096;
+  --color-acento:         #2E74B5;   /* azul acento corporativo */
+  --color-acento-hover:   #1f5a91;
 
-  /* Grises */
-  --color-bg:             #f4f6f9;
+  /* Fondos y superficies */
+  --color-bg:             #F2F2F2;   /* gris claro institucional */
   --color-surface:        #ffffff;
   --color-border:         #dde3ec;
-  --color-border-med:     #c8d2e0;
-  --color-text:           #1c2b3a;
+  --color-border-med:     #bfc9d8;
+  --color-text:           #1c2535;
   --color-text-med:       #4a5e72;
   --color-text-light:     #7a90a4;
 
-  /* Niveles de riesgo */
-  --color-bajo:           #27ae60;
-  --color-bajo-claro:     #d5f5e3;
-  --color-moderado:       #f39c12;
-  --color-moderado-claro: #fef9e7;
-  --color-alto:           #e67e22;
-  --color-alto-claro:     #fdebd0;
-  --color-critico:        #c0392b;
-  --color-critico-claro:  #fadbd8;
+  /* Niveles de riesgo — PASO 6 */
+  --color-bajo:           #70AD47;
+  --color-bajo-claro:     #e8f5dd;
+  --color-bajo-texto:     #3d7020;   /* versión oscura para texto */
+  --color-moderado:       #FFD966;
+  --color-moderado-claro: #fff8cc;
+  --color-moderado-texto: #7d5c00;   /* versión oscura para texto legible */
+  --color-alto:           #FF9933;
+  --color-alto-claro:     #fff0d9;
+  --color-alto-texto:     #a04800;   /* versión oscura para texto */
+  --color-critico:        #FF0000;
+  --color-critico-claro:  #ffe5e5;
+  --color-critico-texto:  #cc0000;   /* versión oscura para texto */
 
   /* Dimensiones */
   --color-d1:             #6c3483;   /* Volatilidad — morado */
-  --color-d2:             #1a5276;   /* Custodia — azul marino */
+  --color-d2:             #1F3864;   /* Custodia — azul institucional */
   --color-d3:             #1e8449;   /* Inejecutabilidad — verde */
   --color-d4:             #922b21;   /* Riesgo jurídico — rojo oscuro */
 
-  /* Tipografía */
-  --font-main:   -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Tipografía: Inter con fallback de sistema */
+  --font-main:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono:   'Courier New', Courier, monospace;
 
   /* Espaciado */
@@ -125,7 +132,7 @@ body {
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #a8d4f5;
+  color: #a8c8f0;
 }
 
 .header-sep {
@@ -163,7 +170,7 @@ body {
 
 .progress-bar-fill {
   height: 100%;
-  background: #a8d4f5;
+  background: #a8c8f0;
   border-radius: 3px;
   transition: width 0.4s ease;
 }
@@ -219,8 +226,8 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-acento);
-  background: #e8f2fb;
-  border: 1px solid #c0d9f0;
+  background: #e6eff8;
+  border: 1px solid #b0cce8;
   border-radius: 20px;
   padding: 2px 10px;
   margin-bottom: var(--gap-sm);
@@ -244,7 +251,7 @@ body {
    4. PANTALLA 0 — INICIO
    ────────────────────────────────────────── */
 #screen0 {
-  background: linear-gradient(160deg, #0f2c47 0%, #1a3a5c 45%, #1e4f7a 100%);
+  background: linear-gradient(160deg, #111e3a 0%, #1F3864 50%, #2a4a80 100%);
   color: #fff;
 }
 
@@ -261,9 +268,9 @@ body {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #a8d4f5;
-  background: rgba(168,212,245,.12);
-  border: 1px solid rgba(168,212,245,.3);
+  color: #a8c8f0;
+  background: rgba(168,200,240,.12);
+  border: 1px solid rgba(168,200,240,.3);
   border-radius: 20px;
   padding: 4px 14px;
   margin-bottom: var(--gap-md);
@@ -274,7 +281,7 @@ body {
   font-size: clamp(3rem, 8vw, 5rem);
   font-weight: 800;
   letter-spacing: 0.05em;
-  color: #a8d4f5;
+  color: #a8c8f0;
   line-height: 1;
   margin-bottom: 0.3rem;
 }
@@ -327,7 +334,7 @@ body {
 .info-card h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: #a8d4f5;
+  color: #a8c8f0;
   margin-bottom: 0.5rem;
 }
 
@@ -427,7 +434,7 @@ body {
 .form-group input:focus,
 .form-group textarea:focus {
   border-color: var(--color-acento);
-  box-shadow: 0 0 0 3px rgba(41,128,185,.15);
+  box-shadow: 0 0 0 3px rgba(46,116,181,.15);
 }
 
 .form-group input.invalid,
@@ -605,6 +612,7 @@ body {
 .opcion-label.selected-moderado {
   border-color: var(--color-moderado);
   background: var(--color-moderado-claro);
+  border-width: 2px;
 }
 
 .opcion-label.selected-alto {
@@ -652,9 +660,9 @@ body {
   text-transform: uppercase;
 }
 
-.opcion-nivel.nivel-bajo     { color: var(--color-bajo); }
-.opcion-nivel.nivel-moderado { color: #c87f0a; }  /* ámbar oscuro para legibilidad */
-.opcion-nivel.nivel-alto     { color: var(--color-alto); }
+.opcion-nivel.nivel-bajo     { color: var(--color-bajo-texto); }
+.opcion-nivel.nivel-moderado { color: var(--color-moderado-texto); }
+.opcion-nivel.nivel-alto     { color: var(--color-alto-texto); }
 
 .opcion-puntos {
   font-size: 0.72rem;
@@ -710,7 +718,7 @@ body {
 .indicator-ayuda {
   margin-top: var(--gap-sm);
   padding: 0.5rem 0.75rem;
-  background: #f0f5fb;
+  background: #eaf1f9;
   border-left: 3px solid var(--color-acento);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   font-size: 0.82rem;
@@ -795,7 +803,7 @@ body {
 
 .dim-breakdown-title {
   padding: var(--gap-sm) var(--gap-md);
-  background: #f8f9fb;
+  background: #ebebeb;
   border-bottom: 1px solid var(--color-border);
   font-size: 0.85rem;
   font-weight: 700;
@@ -913,7 +921,7 @@ body {
 }
 
 .chart-fallback-table th {
-  background: #f0f3f8;
+  background: #ebebeb;
   padding: 0.5rem 0.75rem;
   text-align: left;
   font-size: 0.78rem;
@@ -1143,10 +1151,10 @@ body {
 .text-center { text-align: center; }
 
 /* Colores de nivel reutilizables */
-.color-bajo     { color: var(--color-bajo); }
-.color-moderado { color: var(--color-moderado); }
-.color-alto     { color: var(--color-alto); }
-.color-critico  { color: var(--color-critico); }
+.color-bajo     { color: var(--color-bajo-texto); }
+.color-moderado { color: var(--color-moderado-texto); }
+.color-alto     { color: var(--color-alto-texto); }
+.color-critico  { color: var(--color-critico-texto); }
 
 .bg-bajo     { background: var(--color-bajo); }
 .bg-moderado { background: var(--color-moderado); }
@@ -1155,61 +1163,195 @@ body {
 
 
 /* ──────────────────────────────────────────
-   12. IMPRESIÓN
+   12. IMPRESIÓN — Documento formal A4
    ────────────────────────────────────────── */
 .print-zone {
   display: none;
 }
 
 @media print {
-  /* Ocultar todo excepto la zona de impresión */
+  /* Página A4 con márgenes de documento formal */
+  @page {
+    size: A4 portrait;
+    margin: 2cm 2cm 2.5cm 2cm;
+  }
+
+  /* Ocultar toda la UI de la app */
   body > * {
     display: none !important;
   }
 
+  /* Solo mostrar la zona de impresión */
   .print-zone {
     display: block !important;
-    font-family: var(--font-main);
-    font-size: 11pt;
-    color: #000;
-    line-height: 1.5;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 10.5pt;
+    color: #111;
+    line-height: 1.55;
+    background: #fff;
     padding: 0;
+    margin: 0;
   }
 
-  .print-zone .report-section-title {
-    font-size: 9pt;
-    border-bottom: 1.5pt solid #000;
-    margin-bottom: 6pt;
-  }
-
-  .print-zone .report-field {
-    grid-template-columns: 160pt 1fr;
-    font-size: 10pt;
-  }
-
-  .print-zone .report-total-box {
-    border: 2pt solid #000;
-    padding: 8pt;
-  }
-
-  /* Evitar cortes de página en secciones */
+  /* Secciones del informe */
   .print-zone .report-section {
+    margin-bottom: 1.2cm;
     page-break-inside: avoid;
   }
 
-  @page {
-    margin: 2cm;
-    size: A4;
+  .print-zone .report-section:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Título de sección */
+  .print-zone .report-section-title {
+    font-size: 9pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #1F3864;
+    border-bottom: 1.5pt solid #1F3864;
+    padding-bottom: 2pt;
+    margin-bottom: 8pt;
+  }
+
+  /* Campos del caso */
+  .print-zone .report-field {
+    grid-template-columns: 150pt 1fr;
+    font-size: 10pt;
+    padding: 3pt 0;
+    border-bottom: 0.5pt dashed #bbb;
+  }
+
+  .print-zone .report-field-label {
+    font-weight: 600;
+    color: #444;
+  }
+
+  /* Caja de resultado global */
+  .print-zone .report-total-box {
+    border: 1.5pt solid #555;
+    padding: 8pt 10pt;
+    background: #f9f9f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-zone .report-total-score {
+    font-size: 22pt;
+    font-weight: 800;
+  }
+
+  .print-zone .report-total-nivel {
+    font-size: 13pt;
+    font-weight: 700;
+  }
+
+  /* Tablas de desglose */
+  .print-zone table {
+    font-size: 9.5pt;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .print-zone table th,
+  .print-zone table td {
+    padding: 4pt 6pt;
+    border: 0.5pt solid #ccc;
+  }
+
+  .print-zone table th {
+    background: #e8ecf2 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-weight: 700;
+    color: #1F3864;
+  }
+
+  /* Indicadores */
+  .print-zone [style*="grid-template-columns:4rem"] {
+    font-size: 9pt;
+    padding: 4pt 6pt;
+    border-bottom: 0.5pt solid #ddd;
+    page-break-inside: avoid;
+  }
+
+  /* Orientaciones — lista numerada */
+  .print-zone ol li {
+    font-size: 10pt;
+    line-height: 1.6;
+    margin-bottom: 3pt;
+    page-break-inside: avoid;
+  }
+
+  /* Nota de herramienta de apoyo */
+  .print-zone [style*="background:#f8f9fb"] {
+    background: #f5f5f5 !important;
+    border: 0.75pt solid #ccc !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 9pt;
+  }
+
+  /* Pie de documento */
+  .print-zone [style*="border-top:2px solid"] {
+    border-top: 1pt solid #999 !important;
+    padding-top: 8pt;
+    font-size: 8.5pt;
+    color: #555;
+  }
+
+  /* Forzar colores de fondo en badges de nivel */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Ocultar elementos no deseados en impresión */
+  .btn,
+  button,
+  .app-header,
+  .screen-nav,
+  .report-actions,
+  nav {
+    display: none !important;
   }
 }
 
 
 /* ──────────────────────────────────────────
-   13. RESPONSIVE
+   13. RESPONSIVE — Tablet y móvil
    ────────────────────────────────────────── */
+
+/* Tablet (768px – 1024px) */
+@media (max-width: 1024px) {
+  .screen-container {
+    max-width: 100%;
+    padding: var(--gap-md) var(--gap-md);
+  }
+
+  .home-hero {
+    padding: var(--gap-lg) var(--gap-md) var(--gap-md);
+  }
+
+  .home-info-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    padding: 0 var(--gap-md) var(--gap-lg);
+  }
+
+  .dim-breakdown-row {
+    grid-template-columns: 180px 1fr 90px;
+  }
+}
+
+/* Móvil (< 700px) */
 @media (max-width: 700px) {
   .header-title { display: none; }
   .header-progress { min-width: 120px; }
+
+  .screen-container {
+    padding: var(--gap-md) var(--gap-sm);
+  }
 
   .form-row {
     grid-template-columns: 1fr;
@@ -1218,6 +1360,16 @@ body {
   .results-hero {
     flex-direction: column;
     text-align: center;
+  }
+
+  .results-score-circle {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+  }
+
+  .results-score-number {
+    font-size: 1.8rem;
   }
 
   .dim-breakdown-row {
@@ -1232,6 +1384,10 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .report-field-label {
+    margin-bottom: 0.1rem;
+  }
+
   .report-indicator-row {
     grid-template-columns: 50px 1fr 70px;
   }
@@ -1239,6 +1395,31 @@ body {
   .home-info-grid {
     grid-template-columns: 1fr;
     padding: 0 var(--gap-sm) var(--gap-lg);
+  }
+
+  .case-form {
+    padding: var(--gap-md);
+  }
+
+  .indicator-card {
+    padding: var(--gap-md);
+  }
+
+  .screen-title {
+    font-size: 1.3rem;
+  }
+
+  .report-total-box {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--gap-sm);
+  }
+
+  .report-total-box > div:last-child {
+    border-left: none !important;
+    border-top: 2px solid currentColor;
+    padding-left: 0 !important;
+    padding-top: var(--gap-sm);
   }
 }
 
@@ -1560,8 +1741,9 @@ const MGRPIC_DATA = {
       nivel:      "BAJO",
       min:        0,
       max:        25,
-      color:      "#27ae60",   // verde
-      colorClaro: "#d5f5e3",
+      color:      "#70AD47",   // verde — PASO 6
+      colorClaro: "#e8f5dd",
+      colorTexto: "#3d7020",   // versión oscura para texto sobre blanco
       descripcion: "Riesgo procesal controlado. Las condiciones actuales permiten mantener " +
                    "la custodia ordinaria sin actuaciones urgentes adicionales."
     },
@@ -1569,8 +1751,9 @@ const MGRPIC_DATA = {
       nivel:      "MODERADO",
       min:        26,
       max:        50,
-      color:      "#f39c12",   // ámbar
-      colorClaro: "#fef9e7",
+      color:      "#FFD966",   // ámbar — PASO 6
+      colorClaro: "#fff8cc",
+      colorTexto: "#7d5c00",   // versión oscura para texto legible sobre blanco
       descripcion: "Riesgo procesal significativo. Se recomienda revisar los indicadores " +
                    "con puntuación alta y adoptar medidas preventivas en el corto plazo."
     },
@@ -1578,8 +1761,9 @@ const MGRPIC_DATA = {
       nivel:      "ALTO",
       min:        51,
       max:        75,
-      color:      "#e67e22",   // naranja
-      colorClaro: "#fdebd0",
+      color:      "#FF9933",   // naranja — PASO 6
+      colorClaro: "#fff0d9",
+      colorTexto: "#a04800",   // versión oscura para texto sobre blanco
       descripcion: "Riesgo procesal elevado. Se aconseja elevar propuesta motivada al " +
                    "Juez de Instrucción para adopción de medidas cautelares urgentes " +
                    "(enajenación anticipada, custodio institucional u otras)."
@@ -1588,8 +1772,9 @@ const MGRPIC_DATA = {
       nivel:      "CRÍTICO",
       min:        76,
       max:        100,
-      color:      "#c0392b",   // rojo
-      colorClaro: "#fadbd8",
+      color:      "#FF0000",   // rojo — PASO 6
+      colorClaro: "#ffe5e5",
+      colorTexto: "#cc0000",   // versión oscura para texto sobre blanco
       descripcion: "Riesgo procesal máximo. Actuación inmediata imprescindible. " +
                    "Se recomienda solicitar con carácter urgente autorización judicial " +
                    "para enajenación anticipada o custodia institucional especializada."
@@ -2431,15 +2616,21 @@ const MGRPICReport = (() => {
     return Number(n).toFixed(2);
   }
 
-  /** Devuelve los colores asociados a un nivel de riesgo. */
+  /**
+   * Devuelve los colores asociados a un nivel de riesgo.
+   * color      → color vivo de la paleta (para fondos, bordes, badges)
+   * bg         → fondo claro para cajas
+   * borde      → color de borde (igual que color)
+   * texto      → versión oscura legible sobre blanco para texto y títulos
+   */
   function _estiloNivel(nivelTexto) {
     const mapa = {
-      'BAJO':     { color: '#27ae60', bg: '#d5f5e3', borde: '#1e8449' },
-      'MODERADO': { color: '#d68910', bg: '#fef9e7', borde: '#b7770d' },
-      'ALTO':     { color: '#ca6f1e', bg: '#fdebd0', borde: '#a04000' },
-      'CRÍTICO':  { color: '#c0392b', bg: '#fadbd8', borde: '#922b21' }
+      'BAJO':     { color: '#70AD47', bg: '#e8f5dd', borde: '#70AD47', texto: '#3d7020' },
+      'MODERADO': { color: '#FFD966', bg: '#fff8cc', borde: '#B8860B', texto: '#7d5c00' },
+      'ALTO':     { color: '#FF9933', bg: '#fff0d9', borde: '#FF9933', texto: '#a04800' },
+      'CRÍTICO':  { color: '#FF0000', bg: '#ffe5e5', borde: '#FF0000', texto: '#cc0000' }
     };
-    return mapa[nivelTexto] || { color: '#4a5e72', bg: '#f4f6f9', borde: '#7a90a4' };
+    return mapa[nivelTexto] || { color: '#4a5e72', bg: '#F2F2F2', borde: '#7a90a4', texto: '#4a5e72' };
   }
 
   /* ─────────────────────────────────────────────
@@ -2524,9 +2715,9 @@ const MGRPICReport = (() => {
     const oriItems = (orientaciones[nivel.nivel] || []);
     const primeraOri = oriItems.length > 0
       ? `<div style="margin-top:0.75rem; padding:0.6rem 0.85rem;
-                     background:#fff; border-left:3px solid ${est.color};
+                     background:#fff; border-left:3px solid ${est.borde};
                      border-radius:0 4px 4px 0; font-size:0.86rem; color:#2c3e50; line-height:1.6;">
-           <strong style="color:${est.color}; display:block; margin-bottom:0.25rem;">
+           <strong style="color:${est.texto}; display:block; margin-bottom:0.25rem;">
              Orientación operativa inmediata:
            </strong>
            ${oriItems[0]}
@@ -2537,17 +2728,17 @@ const MGRPICReport = (() => {
       <div class="report-section">
         <div class="report-section-title">2. Resultado Global de Riesgo Procesal</div>
         <div class="report-total-box"
-             style="background:${est.bg}; border:2px solid ${est.color};">
+             style="background:${est.bg}; border:2px solid ${est.borde};">
           <div>
-            <div class="report-total-score" style="color:${est.color}">
+            <div class="report-total-score" style="color:${est.texto}">
               ${_pts(resultado.total)}
             </div>
-            <div style="font-size:0.78rem; color:${est.color}; font-weight:600;">
+            <div style="font-size:0.78rem; color:${est.texto}; font-weight:600;">
               puntos sobre 100
             </div>
           </div>
-          <div style="flex:1; padding-left:1rem; border-left:2px solid ${est.color};">
-            <div class="report-total-nivel" style="color:${est.color}">
+          <div style="flex:1; padding-left:1rem; border-left:2px solid ${est.borde};">
+            <div class="report-total-nivel" style="color:${est.texto}">
               RIESGO ${nivel.nivel}
             </div>
             <div style="font-size:0.86rem; color:#4a5e72; margin-top:0.3rem; line-height:1.55;">
@@ -2692,9 +2883,9 @@ const MGRPICReport = (() => {
       <div class="report-section">
         <div class="report-section-title">5. Orientaciones Operativas Detalladas</div>
 
-        <div style="background:${est.bg}; border-left:4px solid ${est.color};
+        <div style="background:${est.bg}; border-left:4px solid ${est.borde};
                     border-radius:0 4px 4px 0; padding:0.65rem 1rem; margin-bottom:0.75rem;">
-          <div style="font-weight:700; color:${est.color}; font-size:0.95rem; margin-bottom:0.2rem;">
+          <div style="font-weight:700; color:${est.texto}; font-size:0.95rem; margin-bottom:0.2rem;">
             Nivel de Riesgo: ${nivel.nivel} &mdash; ${_pts(resultado.total)} puntos sobre 100
           </div>
           <div style="font-size:0.84rem; color:#4a5e72; line-height:1.55;">
@@ -3210,12 +3401,12 @@ const App = (() => {
         <!-- Puntuación global -->
         <div class="results-hero" style="border-left: 5px solid ${nivel.color}; background: ${nivel.colorClaro}">
           <div class="results-score-circle"
-               style="border-color:${nivel.color}; color:${nivel.color}; background:#fff">
+               style="border-color:${nivel.color}; color:${nivel.colorTexto || nivel.color}; background:#fff">
             <span class="results-score-number">${resultado.total.toFixed(1)}</span>
             <span class="results-score-label">/ 100</span>
           </div>
           <div class="results-level-block">
-            <div class="results-level-text" style="color:${nivel.color}">
+            <div class="results-level-text" style="color:${nivel.colorTexto || nivel.color}">
               ${nivel.nivel}
             </div>
             <div class="results-level-desc">${nivel.descripcion}</div>
@@ -3238,7 +3429,7 @@ const App = (() => {
 
         <!-- Orientación operativa -->
         <div class="orientacion-box">
-          <div class="orientacion-header" style="background:${nivel.color}">
+          <div class="orientacion-header" style="background:${nivel.colorTexto || nivel.color}">
             Orientación operativa — Nivel ${nivel.nivel}
           </div>
           <div class="orientacion-body">

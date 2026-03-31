@@ -33,8 +33,9 @@ const MGRPIC_DATA = {
       nivel:      "BAJO",
       min:        0,
       max:        25,
-      color:      "#27ae60",   // verde
-      colorClaro: "#d5f5e3",
+      color:      "#70AD47",   // verde — PASO 6
+      colorClaro: "#e8f5dd",
+      colorTexto: "#3d7020",   // versión oscura para texto sobre blanco
       descripcion: "Riesgo procesal controlado. Las condiciones actuales permiten mantener " +
                    "la custodia ordinaria sin actuaciones urgentes adicionales."
     },
@@ -42,8 +43,9 @@ const MGRPIC_DATA = {
       nivel:      "MODERADO",
       min:        26,
       max:        50,
-      color:      "#f39c12",   // ámbar
-      colorClaro: "#fef9e7",
+      color:      "#FFD966",   // ámbar — PASO 6
+      colorClaro: "#fff8cc",
+      colorTexto: "#7d5c00",   // versión oscura para texto legible sobre blanco
       descripcion: "Riesgo procesal significativo. Se recomienda revisar los indicadores " +
                    "con puntuación alta y adoptar medidas preventivas en el corto plazo."
     },
@@ -51,8 +53,9 @@ const MGRPIC_DATA = {
       nivel:      "ALTO",
       min:        51,
       max:        75,
-      color:      "#e67e22",   // naranja
-      colorClaro: "#fdebd0",
+      color:      "#FF9933",   // naranja — PASO 6
+      colorClaro: "#fff0d9",
+      colorTexto: "#a04800",   // versión oscura para texto sobre blanco
       descripcion: "Riesgo procesal elevado. Se aconseja elevar propuesta motivada al " +
                    "Juez de Instrucción para adopción de medidas cautelares urgentes " +
                    "(enajenación anticipada, custodio institucional u otras)."
@@ -61,8 +64,9 @@ const MGRPIC_DATA = {
       nivel:      "CRÍTICO",
       min:        76,
       max:        100,
-      color:      "#c0392b",   // rojo
-      colorClaro: "#fadbd8",
+      color:      "#FF0000",   // rojo — PASO 6
+      colorClaro: "#ffe5e5",
+      colorTexto: "#cc0000",   // versión oscura para texto sobre blanco
       descripcion: "Riesgo procesal máximo. Actuación inmediata imprescindible. " +
                    "Se recomienda solicitar con carácter urgente autorización judicial " +
                    "para enajenación anticipada o custodia institucional especializada."

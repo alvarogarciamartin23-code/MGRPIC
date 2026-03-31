@@ -52,15 +52,21 @@ const MGRPICReport = (() => {
     return Number(n).toFixed(2);
   }
 
-  /** Devuelve los colores asociados a un nivel de riesgo. */
+  /**
+   * Devuelve los colores asociados a un nivel de riesgo.
+   * color      → color vivo de la paleta (para fondos, bordes, badges)
+   * bg         → fondo claro para cajas
+   * borde      → color de borde (igual que color)
+   * texto      → versión oscura legible sobre blanco para texto y títulos
+   */
   function _estiloNivel(nivelTexto) {
     const mapa = {
-      'BAJO':     { color: '#27ae60', bg: '#d5f5e3', borde: '#1e8449' },
-      'MODERADO': { color: '#d68910', bg: '#fef9e7', borde: '#b7770d' },
-      'ALTO':     { color: '#ca6f1e', bg: '#fdebd0', borde: '#a04000' },
-      'CRÍTICO':  { color: '#c0392b', bg: '#fadbd8', borde: '#922b21' }
+      'BAJO':     { color: '#70AD47', bg: '#e8f5dd', borde: '#70AD47', texto: '#3d7020' },
+      'MODERADO': { color: '#FFD966', bg: '#fff8cc', borde: '#B8860B', texto: '#7d5c00' },
+      'ALTO':     { color: '#FF9933', bg: '#fff0d9', borde: '#FF9933', texto: '#a04800' },
+      'CRÍTICO':  { color: '#FF0000', bg: '#ffe5e5', borde: '#FF0000', texto: '#cc0000' }
     };
-    return mapa[nivelTexto] || { color: '#4a5e72', bg: '#f4f6f9', borde: '#7a90a4' };
+    return mapa[nivelTexto] || { color: '#4a5e72', bg: '#F2F2F2', borde: '#7a90a4', texto: '#4a5e72' };
   }
 
   /* ─────────────────────────────────────────────
@@ -145,9 +151,9 @@ const MGRPICReport = (() => {
     const oriItems = (orientaciones[nivel.nivel] || []);
     const primeraOri = oriItems.length > 0
       ? `<div style="margin-top:0.75rem; padding:0.6rem 0.85rem;
-                     background:#fff; border-left:3px solid ${est.color};
+                     background:#fff; border-left:3px solid ${est.borde};
                      border-radius:0 4px 4px 0; font-size:0.86rem; color:#2c3e50; line-height:1.6;">
-           <strong style="color:${est.color}; display:block; margin-bottom:0.25rem;">
+           <strong style="color:${est.texto}; display:block; margin-bottom:0.25rem;">
              Orientación operativa inmediata:
            </strong>
            ${oriItems[0]}
@@ -158,17 +164,17 @@ const MGRPICReport = (() => {
       <div class="report-section">
         <div class="report-section-title">2. Resultado Global de Riesgo Procesal</div>
         <div class="report-total-box"
-             style="background:${est.bg}; border:2px solid ${est.color};">
+             style="background:${est.bg}; border:2px solid ${est.borde};">
           <div>
-            <div class="report-total-score" style="color:${est.color}">
+            <div class="report-total-score" style="color:${est.texto}">
               ${_pts(resultado.total)}
             </div>
-            <div style="font-size:0.78rem; color:${est.color}; font-weight:600;">
+            <div style="font-size:0.78rem; color:${est.texto}; font-weight:600;">
               puntos sobre 100
             </div>
           </div>
-          <div style="flex:1; padding-left:1rem; border-left:2px solid ${est.color};">
-            <div class="report-total-nivel" style="color:${est.color}">
+          <div style="flex:1; padding-left:1rem; border-left:2px solid ${est.borde};">
+            <div class="report-total-nivel" style="color:${est.texto}">
               RIESGO ${nivel.nivel}
             </div>
             <div style="font-size:0.86rem; color:#4a5e72; margin-top:0.3rem; line-height:1.55;">
@@ -313,9 +319,9 @@ const MGRPICReport = (() => {
       <div class="report-section">
         <div class="report-section-title">5. Orientaciones Operativas Detalladas</div>
 
-        <div style="background:${est.bg}; border-left:4px solid ${est.color};
+        <div style="background:${est.bg}; border-left:4px solid ${est.borde};
                     border-radius:0 4px 4px 0; padding:0.65rem 1rem; margin-bottom:0.75rem;">
-          <div style="font-weight:700; color:${est.color}; font-size:0.95rem; margin-bottom:0.2rem;">
+          <div style="font-weight:700; color:${est.texto}; font-size:0.95rem; margin-bottom:0.2rem;">
             Nivel de Riesgo: ${nivel.nivel} &mdash; ${_pts(resultado.total)} puntos sobre 100
           </div>
           <div style="font-size:0.84rem; color:#4a5e72; line-height:1.55;">

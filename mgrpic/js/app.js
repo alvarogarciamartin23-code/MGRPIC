@@ -444,12 +444,12 @@ const App = (() => {
         <!-- Puntuación global -->
         <div class="results-hero" style="border-left: 5px solid ${nivel.color}; background: ${nivel.colorClaro}">
           <div class="results-score-circle"
-               style="border-color:${nivel.color}; color:${nivel.color}; background:#fff">
+               style="border-color:${nivel.color}; color:${nivel.colorTexto || nivel.color}; background:#fff">
             <span class="results-score-number">${resultado.total.toFixed(1)}</span>
             <span class="results-score-label">/ 100</span>
           </div>
           <div class="results-level-block">
-            <div class="results-level-text" style="color:${nivel.color}">
+            <div class="results-level-text" style="color:${nivel.colorTexto || nivel.color}">
               ${nivel.nivel}
             </div>
             <div class="results-level-desc">${nivel.descripcion}</div>
@@ -472,7 +472,7 @@ const App = (() => {
 
         <!-- Orientación operativa -->
         <div class="orientacion-box">
-          <div class="orientacion-header" style="background:${nivel.color}">
+          <div class="orientacion-header" style="background:${nivel.colorTexto || nivel.color}">
             Orientación operativa — Nivel ${nivel.nivel}
           </div>
           <div class="orientacion-body">
