@@ -2999,7 +2999,8 @@ const MGRPICReport = (() => {
       secIndicadores,
       secOrientacion,
       secPie
-    ].join('\n');
+    ].join('
+');
   }
 
   // API pública
@@ -3238,22 +3239,23 @@ const App = (() => {
     const dimIndex = PANTALLA_A_DIM[pantallaOrigen];
     if (dimIndex === undefined) { irA(destino); return; }
 
-    // Validar solo los indicadores de esta dimensión contra estado.respuestas
-    const dimension = MGRPIC_DATA.dimensiones[dimIndex];
-    const faltantes = dimension.indicadores.filter(ind => {
-      const v = estado.respuestas[ind.id];
-      return v === undefined || v === null || v === '';
+    // Usar validateAnswers() para obtener el detalle de qué falta
+    const dimension   = MGRPIC_DATA.dimensiones[dimIndex];
+    const soloEstaDim = {};
+    dimension.indicadores.forEach(ind => {
+      soloEstaDim[ind.id] = estado.respuestas[ind.id];
     });
-    const valido = faltantes.length === 0;
+    const validacion = MGRPICScoring.validateAnswers(soloEstaDim);
 
     // Actualizar clases visuales de cada tarjeta según el resultado
     dimension.indicadores.forEach(ind => {
       const card = document.getElementById('card-' + ind.id);
       if (!card) return;
-      card.classList.toggle('sin-respuesta', faltantes.some(f => f.id === ind.id));
+      const esFaltante = validacion.faltantes.some(f => f.id === ind.id);
+      card.classList.toggle('sin-respuesta', esFaltante);
     });
 
-    if (!valido) {
+    if (!validacion.valido) {
       // Hacer scroll al primer indicador sin respuesta
       const primera = document.querySelector('.sin-respuesta');
       if (primera) primera.scrollIntoView({ behavior: 'smooth', block: 'center' });

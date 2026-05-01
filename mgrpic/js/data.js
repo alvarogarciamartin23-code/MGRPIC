@@ -10,20 +10,34 @@
  *   La puntuación total es la suma de las cuatro dimensiones (escala 0-100).
  *
  * Fórmulas:
- *   Dim I  (Volatilidad)              = (V1+V2+V3+V4) × 4.375
- *   Dim II (Custodia)                 = (C1+C2+C3+C4) × 3.125
- *   Dim III (Inejecutabilidad)        = (I1+I2+I3+I4) × 3.125
- *   Dim IV (Riesgo Jurídico-Procesal) = (J1+J2+J3)    × 2.5
+ *   Dim I  (Volatilidad)                  = (V1+V2+V3+V4) × 3.75
+ *   Dim II (Custodia)                     = (C1+C2)       × 6.25
+ *   Dim III (Inejecutabilidad del decomiso)= (I1+I2)       × 6.25
+ *   Dim IV (Contexto operativo policial)  = (J1+J2+J3)    × (10/3)
  *   TOTAL = Dim I + Dim II + Dim III + Dim IV  (0-100 puntos)
+ *
+ * Verificación de máximos:
+ *   Dim I  : 8 × 3.75   = 30
+ *   Dim II : 4 × 6.25   = 25
+ *   Dim III: 4 × 6.25   = 25
+ *   Dim IV : 6 × (10/3) = 20
+ *   TOTAL máximo        = 100 ✓
+ *
+ * Uso:
+ *   La herramienta se aplica cuando el criptoactivo ya ha sido incautado y transferido
+ *   al monedero bajo control policial. Apoya dos decisiones:
+ *     1. Qué modelo de custodia adoptar.
+ *     2. Si procede elevar propuesta de enajenación anticipada al Ministerio Fiscal.
+ *   NO es una herramienta judicial.
  */
 
 const MGRPIC_DATA = {
 
-  version: "1.0",
+  version: "2.0",
   nombre: "Matriz de Gestión de Riesgo Procesal en la Incautación de Criptoactivos",
   acronimo: "MGRPIC",
-  descripcion: "Herramienta de apoyo a la decisión policial y judicial española para evaluar " +
-               "el riesgo procesal de criptoactivos incautados en procedimientos penales.",
+  descripcion: "Herramienta de apoyo a la decisión para unidades de Policía Judicial " +
+               "en la gestión de criptoactivos incautados en procedimientos penales.",
 
   /* ─────────────────────────────────────────────
    * ESCALA GLOBAL DE RIESGO (sobre puntuación 0-100)
@@ -33,43 +47,48 @@ const MGRPIC_DATA = {
       nivel:      "BAJO",
       min:        0,
       max:        25,
-      color:      "#70AD47",   // verde — PASO 6
+      color:      "#70AD47",
       colorClaro: "#e8f5dd",
-      colorTexto: "#3d7020",   // versión oscura para texto sobre blanco
-      descripcion: "Riesgo procesal controlado. Las condiciones actuales permiten mantener " +
-                   "la custodia ordinaria sin actuaciones urgentes adicionales."
+      colorTexto: "#3d7020",
+      descripcion: "Riesgo procesal controlado. Mantener custodia ordinaria bajo supervisión " +
+                   "del LAJ. Incorporar resultado al atestado. Reevaluar si algún indicador " +
+                   "cambia significativamente."
     },
     {
       nivel:      "MODERADO",
       min:        26,
       max:        50,
-      color:      "#FFD966",   // ámbar — PASO 6
+      color:      "#FFD966",
       colorClaro: "#fff8cc",
-      colorTexto: "#7d5c00",   // versión oscura para texto legible sobre blanco
-      descripcion: "Riesgo procesal significativo. Se recomienda revisar los indicadores " +
-                   "con puntuación alta y adoptar medidas preventivas en el corto plazo."
+      colorTexto: "#7d5c00",
+      descripcion: "Riesgo procesal significativo. Valorar encomienda a la ORGA o custodio " +
+                   "institucional especializado. Documentar variaciones de precio mensualmente. " +
+                   "Si V.2 asciende a Alto, elevar propuesta motivada al Ministerio Fiscal para " +
+                   "que inste la enajenación anticipada conforme al art. 367 ter LECrim."
     },
     {
       nivel:      "ALTO",
       min:        51,
       max:        75,
-      color:      "#FF9933",   // naranja — PASO 6
+      color:      "#FF9933",
       colorClaro: "#fff0d9",
-      colorTexto: "#a04800",   // versión oscura para texto sobre blanco
-      descripcion: "Riesgo procesal elevado. Se aconseja elevar propuesta motivada al " +
-                   "Juez de Instrucción para adopción de medidas cautelares urgentes " +
-                   "(enajenación anticipada, custodio institucional u otras)."
+      colorTexto: "#a04800",
+      descripcion: "Riesgo procesal elevado. Elevar propuesta motivada al Ministerio Fiscal " +
+                   "en el plazo más breve posible. Solicitar perito especializado en activos " +
+                   "digitales. Valorar la enajenación anticipada o conversión a moneda fiduciaria estable."
     },
     {
       nivel:      "CRÍTICO",
       min:        76,
       max:        100,
-      color:      "#FF0000",   // rojo — PASO 6
+      color:      "#FF0000",
       colorClaro: "#ffe5e5",
-      colorTexto: "#cc0000",   // versión oscura para texto sobre blanco
-      descripcion: "Riesgo procesal máximo. Actuación inmediata imprescindible. " +
-                   "Se recomienda solicitar con carácter urgente autorización judicial " +
-                   "para enajenación anticipada o custodia institucional especializada."
+      colorTexto: "#cc0000",
+      descripcion: "Riesgo procesal máximo. Actuación inmediata en las primeras 24-48 horas. " +
+                   "Comunicación urgente al Ministerio Fiscal. Elevación inmediata de propuesta " +
+                   "de enajenación anticipada al amparo del art. 367 ter LECrim. Apertura de pieza " +
+                   "separada de responsabilidad civil. Valorar bloqueo cautelar de activos en " +
+                   "exchanges identificados."
     }
   ],
 
@@ -80,19 +99,19 @@ const MGRPIC_DATA = {
 
     /* ══════════════════════════════════════════
      * DIMENSIÓN I — VOLATILIDAD
-     * Peso: 35 % | Factor: 4.375 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 35
+     * Peso: 30 % | Factor: 3.75 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 30
      * ══════════════════════════════════════════ */
     {
-      id:          "D1",
-      codigo:      "V",
-      nombre:      "Volatilidad",
-      peso:        35,           // porcentaje
-      factor:      4.375,        // multiplicador sobre suma bruta
-      maxBruto:    8,            // 4 indicadores × máx. 2 puntos
-      maxPonderado:35,
-      color:       "#6c3483",
-      descripcion: "Evalúa el riesgo de pérdida de valor económico de los criptoactivos " +
-                   "durante la tramitación del procedimiento penal.",
+      id:           "D1",
+      codigo:       "V",
+      nombre:       "Volatilidad",
+      peso:         30,
+      factor:       3.75,
+      maxBruto:     8,
+      maxPonderado: 30,
+      color:        "#6c3483",
+      descripcion:  "Evalúa el riesgo de pérdida de valor económico de los criptoactivos " +
+                    "durante la tramitación del procedimiento penal.",
 
       indicadores: [
         {
@@ -123,10 +142,10 @@ const MGRPIC_DATA = {
         {
           id:          "V2",
           codigo:      "V.2",
-          nombre:      "Variación de precio en los 30 días previos",
-          descripcion: "Oscilación porcentual del precio de mercado en el último mes natural.",
+          nombre:      "Variación de precio en los 30 días previos a la incautación",
+          descripcion: "Oscilación porcentual del precio de mercado en el mes anterior a la intervención.",
           ayuda:       "Consulte fuentes como CoinMarketCap o CoinGecko para obtener la variación " +
-                       "en los 30 días anteriores a la fecha de evaluación.",
+                       "en los 30 días anteriores a la fecha de incautación.",
           opciones: [
             {
               valor:    0,
@@ -148,25 +167,25 @@ const MGRPIC_DATA = {
         {
           id:          "V3",
           codigo:      "V.3",
-          nombre:      "Duración estimada del proceso",
-          descripcion: "Plazo previsible hasta resolución judicial firme que ponga fin al procedimiento.",
-          ayuda:       "Tenga en cuenta la complejidad del asunto, el número de investigados, " +
-                       "la existencia de elementos internacionales y la carga del juzgado.",
+          nombre:      "Complejidad de la causa como indicador de duración estimada",
+          descripcion: "Grado de complejidad del procedimiento en función de sus elementos objetivos.",
+          ayuda:       "Tenga en cuenta el número de investigados, la existencia de diligencias " +
+                       "internacionales y la complejidad económica de la causa.",
           opciones: [
             {
               valor:    0,
               nivel:    "Bajo",
-              etiqueta: "Menos de 6 meses"
+              etiqueta: "Causa sencilla, investigado único, sin cooperación internacional y sin complejidad económica relevante"
             },
             {
               valor:    1,
               nivel:    "Moderado",
-              etiqueta: "Entre 6 meses y 2 años"
+              etiqueta: "Causa con varios investigados o con alguna diligencia internacional pendiente o complejidad económica media"
             },
             {
               valor:    2,
               nivel:    "Alto",
-              etiqueta: "Más de 2 años o causa con complejidad internacional"
+              etiqueta: "Causa compleja con múltiples investigados, cooperación internacional activa o estructura criminal organizada"
             }
           ]
         },
@@ -200,19 +219,19 @@ const MGRPIC_DATA = {
 
     /* ══════════════════════════════════════════
      * DIMENSIÓN II — CUSTODIA
-     * Peso: 25 % | Factor: 3.125 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 25
+     * Peso: 25 % | Factor: 6.25 | Indicadores: 2 | Máx. bruto: 4 | Máx. ponderado: 25
      * ══════════════════════════════════════════ */
     {
-      id:          "D2",
-      codigo:      "C",
-      nombre:      "Custodia",
-      peso:        25,
-      factor:      3.125,
-      maxBruto:    8,
-      maxPonderado:25,
-      color:       "#1a5276",
-      descripcion: "Evalúa la seguridad física y documental del sistema de custodia " +
-                   "de las claves privadas de los criptoactivos incautados.",
+      id:           "D2",
+      codigo:       "C",
+      nombre:       "Custodia",
+      peso:         25,
+      factor:       6.25,
+      maxBruto:     4,
+      maxPonderado: 25,
+      color:        "#1a5276",
+      descripcion:  "Evalúa la seguridad física y documental del sistema de custodia " +
+                    "de las claves privadas de los criptoactivos incautados.",
 
       indicadores: [
         {
@@ -226,7 +245,7 @@ const MGRPIC_DATA = {
             {
               valor:    0,
               nivel:    "Bajo",
-              etiqueta: "Custodio institucional especializado (Prosegur Crypto u ORGA) con contrato formalizado"
+              etiqueta: "Custodio institucional especializado (Prosegur Crypto o ORGA) con contrato formalizado"
             },
             {
               valor:    1,
@@ -243,7 +262,7 @@ const MGRPIC_DATA = {
         {
           id:          "C2",
           codigo:      "C.2",
-          nombre:      "Número de personas con conocimiento de la clave",
+          nombre:      "Número de personas con conocimiento de la clave privada",
           descripcion: "Cantidad de personas que conocen la clave privada o la frase semilla completa.",
           ayuda:       "Incluya a todos los agentes, funcionarios y terceros que hayan tenido acceso " +
                        "a la información de acceso a la cartera.",
@@ -264,75 +283,25 @@ const MGRPIC_DATA = {
               etiqueta: "Más de tres personas o acceso sin documentación formal"
             }
           ]
-        },
-        {
-          id:          "C3",
-          codigo:      "C.3",
-          nombre:      "Copia de seguridad de la frase semilla (seed phrase)",
-          descripcion: "Existencia y situación de la copia de respaldo de la frase de recuperación.",
-          ayuda:       "Verifique si existe copia de la seed phrase, dónde se encuentra y si está " +
-                       "bajo custodia judicial formalizada.",
-          opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Copia verificada en custodia independiente bajo acta judicial"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Copia existente pero sin custodia formal documentada"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Copia no localizada, destruida o en paradero desconocido"
-            }
-          ]
-        },
-        {
-          id:          "C4",
-          codigo:      "C.4",
-          nombre:      "Verificación periódica del saldo en cadena de bloques",
-          descripcion: "Frecuencia y método de comprobación de que los activos permanecen en la dirección custodiada.",
-          ayuda:       "Compruebe si existe protocolo de verificación del saldo y si está documentado. " +
-                       "La verificación puede hacerse con un explorador de bloques (blockexplorer) sin necesidad de acceder a la clave.",
-          opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Verificación automatizada y documentada con registro de fechas"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Verificación manual realizada al inicio y cada tres meses"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Sin verificación realizada o incapacidad técnica para efectuarla"
-            }
-          ]
         }
       ]
     },
 
     /* ══════════════════════════════════════════
      * DIMENSIÓN III — INEJECUTABILIDAD DEL DECOMISO
-     * Peso: 25 % | Factor: 3.125 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 25
+     * Peso: 25 % | Factor: 6.25 | Indicadores: 2 | Máx. bruto: 4 | Máx. ponderado: 25
      * ══════════════════════════════════════════ */
     {
-      id:          "D3",
-      codigo:      "I",
-      nombre:      "Inejecutabilidad del Decomiso",
-      peso:        25,
-      factor:      3.125,
-      maxBruto:    8,
-      maxPonderado:25,
-      color:       "#1e8449",
-      descripcion: "Evalúa los factores que pueden impedir la ejecución efectiva del decomiso " +
-                   "de los criptoactivos una vez dictada la resolución judicial.",
+      id:           "D3",
+      codigo:       "I",
+      nombre:       "Inejecutabilidad del Decomiso",
+      peso:         25,
+      factor:       6.25,
+      maxBruto:     4,
+      maxPonderado: 25,
+      color:        "#1e8449",
+      descripcion:  "Evalúa los factores que pueden impedir la ejecución efectiva del decomiso " +
+                    "de los criptoactivos una vez dictada la resolución judicial.",
 
       indicadores: [
         {
@@ -346,7 +315,7 @@ const MGRPIC_DATA = {
             {
               valor:    0,
               nivel:    "Bajo",
-              etiqueta: "Dirección pública verificada y vinculada directamente al investigado mediante datos del exchange"
+              etiqueta: "Dirección pública verificada y vinculada directamente al investigado mediante datos del exchange con KYC"
             },
             {
               valor:    1,
@@ -363,65 +332,15 @@ const MGRPIC_DATA = {
         {
           id:          "I2",
           codigo:      "I.2",
-          nombre:      "Disponibilidad de la clave privada",
-          descripcion: "Situación de la clave privada necesaria para ejecutar el decomiso o la transferencia judicial.",
-          ayuda:       "Indique si las claves han sido obtenidas lícitamente, si están pendientes de " +
-                       "transferencia formal o si son desconocidas/destruidas.",
-          opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Clave obtenida y bajo custodia formalizada"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Clave conocida pero pendiente de transferencia formal"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Clave desconocida, destruida o en poder exclusivo de un investigado no cooperante"
-            }
-          ]
-        },
-        {
-          id:          "I3",
-          codigo:      "I.3",
-          nombre:      "Situación procesal del investigado",
-          descripcion: "Estado de libertad o detención del investigado y su disposición a cooperar.",
-          ayuda:       "La situación de libertad del investigado con acceso potencial a dispositivos " +
-                       "o conocimiento de las claves aumenta significativamente el riesgo de frustración del decomiso.",
-          opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Investigado en prisión provisional o en situación de detención"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Investigado en libertad provisional con medidas cautelares personales"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Investigado no localizado, en paradero desconocido o en país sin cooperación judicial"
-            }
-          ]
-        },
-        {
-          id:          "I4",
-          codigo:      "I.4",
           nombre:      "Localización de los activos respecto a exchanges cooperantes",
           descripcion: "Situación de los activos en relación con plataformas sometidas a obligaciones de cooperación judicial.",
           ayuda:       "Valore si los activos están en exchanges regulados en España/UE con protocolo de " +
-                       "cooperación establecido, o en plataformas descentralizadas/no cooperantes.",
+                       "cooperación establecido, o en plataformas descentralizadas o no cooperantes.",
           opciones: [
             {
               valor:    0,
               nivel:    "Bajo",
-              etiqueta: "Todos los activos identificados en exchanges sujetos a obligaciones de cooperación"
+              etiqueta: "Todos los activos identificados en exchanges sujetos a obligaciones de cooperación judicial"
             },
             {
               valor:    1,
@@ -439,94 +358,94 @@ const MGRPIC_DATA = {
     },
 
     /* ══════════════════════════════════════════
-     * DIMENSIÓN IV — RIESGO JURÍDICO-PROCESAL
-     * Peso: 15 % | Factor: 2.5 | Indicadores: 3 | Máx. bruto: 6 | Máx. ponderado: 15
+     * DIMENSIÓN IV — CONTEXTO OPERATIVO POLICIAL
+     * Peso: 20 % | Factor: 10/3 ≈ 3.3333 | Indicadores: 3 | Máx. bruto: 6 | Máx. ponderado: 20
      * ══════════════════════════════════════════ */
     {
-      id:          "D4",
-      codigo:      "J",
-      nombre:      "Riesgo Jurídico-Procesal",
-      peso:        15,
-      factor:      2.5,
-      maxBruto:    6,
-      maxPonderado:15,
-      color:       "#922b21",
-      descripcion: "Evalúa los riesgos legales y procesales derivados de la falta de " +
-                   "criterio judicial consolidado y de la posible responsabilidad patrimonial del Estado.",
+      id:           "D4",
+      codigo:       "J",
+      nombre:       "Contexto Operativo Policial",
+      peso:         20,
+      factor:       10 / 3,
+      maxBruto:     6,
+      maxPonderado: 20,
+      color:        "#922b21",
+      descripcion:  "Evalúa las condiciones operativas de la unidad policial actuante y la " +
+                    "urgencia de la decisión sobre custodia y enajenación anticipada.",
 
       indicadores: [
         {
           id:          "J1",
           codigo:      "J.1",
-          nombre:      "Existencia de criterio judicial previo del órgano sobre criptoactivos",
-          descripcion: "Grado de consolidación de doctrina judicial en el juzgado y audiencia de referencia.",
-          ayuda:       "Consulte las resoluciones del juzgado y de la Audiencia Provincial sobre custodia " +
-                       "y enajenación de criptoactivos. La ausencia de criterio propio eleva la incertidumbre procesal.",
+          nombre:      "Existencia de protocolo previo en la unidad para intervención de criptoactivos",
+          descripcion: "Grado de preparación operativa de la unidad policial para gestionar activos digitales.",
+          ayuda:       "Compruebe si la unidad dispone de protocolo escrito, de personal con formación " +
+                       "acreditada o de acceso a una unidad especializada de apoyo.",
           opciones: [
             {
               valor:    0,
               nivel:    "Bajo",
-              etiqueta: "El juzgado ha dictado resoluciones previas sobre custodia o enajenación de criptoactivos con criterio consolidado"
+              etiqueta: "Unidad con protocolo específico documentado y personal con formación acreditada en activos digitales"
             },
             {
               valor:    1,
               nivel:    "Moderado",
-              etiqueta: "El juzgado carece de criterio propio pero existe doctrina de la Audiencia Provincial de referencia"
+              etiqueta: "Sin protocolo propio pero con acceso a unidad especializada de apoyo disponible"
             },
             {
               valor:    2,
               nivel:    "Alto",
-              etiqueta: "Sin precedente en el juzgado ni en la Audiencia; criterio completamente incierto"
+              etiqueta: "Sin protocolo, sin personal formado y sin unidad especializada de apoyo disponible"
             }
           ]
         },
         {
           id:          "J2",
           codigo:      "J.2",
-          nombre:      "Probabilidad de reclamación patrimonial por variación de valor",
-          descripcion: "Riesgo de que el investigado o tercero reclame daños por la pérdida o ganancia de valor durante la custodia.",
-          ayuda:       "Si el activo ha variado más de un 25% desde la incautación sin que se haya adoptado " +
-                       "ninguna decisión de gestión, el riesgo de reclamación patrimonial contra la Administración es elevado.",
+          nombre:      "Urgencia de la decisión de enajenación anticipada",
+          descripcion: "Valoración de si la custodia ordinaria puede mantener el valor patrimonial del activo.",
+          ayuda:       "Combine la volatilidad del activo con la duración estimada de la causa para " +
+                       "determinar si la custodia ordinaria genera riesgo patrimonial relevante.",
           opciones: [
             {
               valor:    0,
               nivel:    "Bajo",
-              etiqueta: "Activo ya enajenado o convertido; valor congelado documentalmente en el acta"
+              etiqueta: "Activo estable en valor y causa de corta duración estimada; la custodia ordinaria no genera riesgo patrimonial relevante"
             },
             {
               valor:    1,
               nivel:    "Moderado",
-              etiqueta: "Activo en custodia con variación de valor documentada pero inferior al umbral de activación"
+              etiqueta: "Activo con volatilidad moderada o causa larga; conveniente elevar propuesta de enajenación al Fiscal en plazo breve"
             },
             {
               valor:    2,
               nivel:    "Alto",
-              etiqueta: "Activo en custodia con variación superior al 25% desde la incautación y sin decisión de gestión adoptada"
+              etiqueta: "Activo con alta volatilidad o valor elevado con causa larga; la custodia ordinaria genera riesgo patrimonial inmediato que justifica propuesta urgente"
             }
           ]
         },
         {
           id:          "J3",
           codigo:      "J.3",
-          nombre:      "Claridad de la cadena de responsabilidad institucional",
-          descripcion: "Grado de definición formal de quién responde de los activos en cada fase del procedimiento.",
+          nombre:      "Claridad de la cadena de responsabilidad sobre el activo incautado",
+          descripcion: "Grado de definición formal de quién responde del activo en cada fase del procedimiento.",
           ayuda:       "Verifique si existe contrato con custodio, acta de entrega entre LAJ y Policía Judicial, " +
-                       "o si la custodia se desarrolla de forma informal sin documentación de responsabilidad.",
+                       "o si la custodia se desarrolla sin documentación formal de responsabilidad.",
           opciones: [
             {
               valor:    0,
               nivel:    "Bajo",
-              etiqueta: "Responsabilidad claramente atribuida al custodio institucional mediante contrato o convenio formal"
+              etiqueta: "Responsabilidad sobre la clave claramente atribuida al custodio institucional mediante contrato o convenio formal"
             },
             {
               valor:    1,
               nivel:    "Moderado",
-              etiqueta: "Responsabilidad compartida entre LAJ y Policía Judicial con acta de entrega documentada"
+              etiqueta: "Responsabilidad compartida entre LAJ y Policía Judicial con acta de entrega formalmente documentada"
             },
             {
               valor:    2,
               nivel:    "Alto",
-              etiqueta: "Custodia informal sin atribución clara de responsabilidad ni documentación de entrega"
+              etiqueta: "Custodia sin atribución clara de responsabilidad o sin documentación formal de la entrega de la clave"
             }
           ]
         }

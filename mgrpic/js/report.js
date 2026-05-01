@@ -114,8 +114,8 @@ const MGRPICReport = (() => {
           <div style="font-size:0.78rem; font-weight:600; color:#4a5e72;
                       text-transform:uppercase; letter-spacing:0.08em;
                       margin-top:0.4rem; line-height:1.5;">
-            Herramienta de Apoyo a la Decisión Policial y Judicial<br>
-            en Materia de Criptoactivos Incautados
+            Herramienta de Apoyo a la Decisión para Unidades de Policía Judicial<br>
+            en la Gestión de Criptoactivos Incautados
           </div>
           <div style="margin-top:0.6rem; font-size:0.78rem; color:#7a90a4;">
             Fecha y hora de generación: <strong>${ahora}</strong>
@@ -123,8 +123,8 @@ const MGRPICReport = (() => {
         </div>
         <div style="font-size:0.74rem; color:#7a90a4; font-style:italic;
                     text-align:center; border-top:1px solid #dde3ec; padding-top:0.5rem;">
-          Los resultados de este informe tienen carácter orientativo. No sustituyen el criterio
-          judicial ni la valoración jurídica de los profesionales responsables del procedimiento.
+          Los resultados de este informe tienen carácter orientativo para la unidad policial actuante.
+          Las decisiones sobre medidas cautelares corresponden al Ministerio Fiscal y al órgano judicial competente.
         </div>
       </div>`;
 
@@ -323,12 +323,12 @@ const MGRPICReport = (() => {
         ${bloquesDim}
       </div>`;
 
-    // ── SECCIÓN 5 — ORIENTACIONES OPERATIVAS DETALLADAS ──────────────────
+    // ── SECCIÓN 5 — PROTOCOLO POLICIAL DE ACTUACIÓN ──────────────────────
     const oriListItems = oriItems.map(p => `<li style="line-height:1.65;">${p}</li>`).join('');
 
     const secOrientacion = `
       <div class="report-section">
-        <div class="report-section-title">5. Orientaciones Operativas Detalladas</div>
+        <div class="report-section-title">5. Protocolo Policial de Actuación</div>
 
         <div style="background:${est.bg}; border-left:4px solid ${est.borde};
                     border-radius:0 4px 4px 0; padding:0.65rem 1rem; margin-bottom:0.75rem;">
@@ -348,8 +348,8 @@ const MGRPICReport = (() => {
         <div style="background:#f8f9fb; border:1px solid #dde3ec; border-radius:4px;
                     padding:0.65rem 0.9rem; font-size:0.78rem; color:#4a5e72;
                     line-height:1.65; margin-top:0.5rem;">
-          <strong style="color:#1a3a5c;">Nota sobre la naturaleza de esta herramienta:</strong>
-          La MGRPIC es una herramienta de <em>apoyo a la decisión</em> diseñada para agentes de Policía Judicial y Letrados de la Administración de Justicia. Las orientaciones operativas recogidas en este informe tienen carácter orientativo y metodológico. <strong>La decisión final sobre las medidas a adoptar corresponde en todo caso al Juez de Instrucción competente</strong>, quien resolverá conforme al ordenamiento jurídico español y a las circunstancias concretas del procedimiento. Este informe podrá adjuntarse al acta de intervención o elevarse al órgano judicial como soporte documental de la solicitud de medidas cautelares.
+          <strong style="color:#1a3a5c;">Nota sobre el alcance de esta herramienta:</strong>
+          La MGRPIC es una herramienta de <em>apoyo a la decisión</em> de uso policial, destinada a las unidades de Policía Judicial que intervienen criptoactivos. Se aplica cuando el activo ya ha sido incautado y transferido al monedero bajo control policial. Apoya dos decisiones: qué modelo de custodia adoptar y si procede elevar propuesta de enajenación anticipada al Ministerio Fiscal. <strong>No es una herramienta judicial.</strong> Las decisiones sobre medidas cautelares corresponden al Ministerio Fiscal y al órgano judicial competente conforme al art. 367 ter LECrim. Este informe podrá adjuntarse al atestado como soporte documental de la propuesta policial.
         </div>
       </div>`;
 
@@ -371,8 +371,8 @@ const MGRPICReport = (() => {
           </div>
           <div style="text-align:right; font-style:italic; line-height:1.7;">
             Documento generado automáticamente por la aplicación MGRPIC.<br>
-            No sustituye al criterio judicial ni a la resolución<br>
-            del órgano competente.
+            Uso exclusivo para unidades de Policía Judicial.<br>
+            Las decisiones cautelares corresponden al Ministerio Fiscal y al órgano judicial.
           </div>
         </div>
       </div>`;

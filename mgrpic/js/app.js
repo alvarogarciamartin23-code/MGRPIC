@@ -31,8 +31,8 @@ const App = (() => {
     datosCaso: {},
 
     /**
-     * Respuestas del usuario a los 15 indicadores.
-     * Objeto plano: { V1: 0, V2: 1, C3: 2, ... }
+     * Respuestas del usuario a los 11 indicadores.
+     * Objeto plano: { V1: 0, V2: 1, C1: 2, ... }
      */
     respuestas: {},
 
@@ -507,7 +507,7 @@ const App = (() => {
         <!-- Orientación operativa -->
         <div class="orientacion-box">
           <div class="orientacion-header" style="background:${nivel.colorTexto || nivel.color}">
-            Orientación operativa — Nivel ${nivel.nivel}
+            Protocolo policial de actuación — Nivel ${nivel.nivel}
           </div>
           <div class="orientacion-body">
             <ul>${orientacionHtml}</ul>
@@ -615,7 +615,7 @@ const App = (() => {
           <div class="screen-step-badge">Paso 7 de ${TOTAL_PASOS} — Informe final</div>
           <h2 class="screen-title">Informe MGRPIC</h2>
           <p class="screen-desc">
-            Informe completo listo para incorporar al acta de intervención o trasladar al Juez de Instrucción.
+            Informe completo listo para incorporar al atestado o trasladar al Ministerio Fiscal.
           </p>
         </div>
 

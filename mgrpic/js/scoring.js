@@ -6,12 +6,12 @@
  * detalladas por dimensión, la puntuación total ponderada (escala 0-100),
  * el nivel de riesgo y la orientación operativa correspondiente.
  *
- * FÓRMULAS DE CÁLCULO (Paso 2):
- *   Dim I  — Volatilidad              = (V1+V2+V3+V4) × 4.375   → máx. 35 pts
- *   Dim II — Custodia                 = (C1+C2+C3+C4) × 3.125   → máx. 25 pts
- *   Dim III — Inejecutabilidad        = (I1+I2+I3+I4) × 3.125   → máx. 25 pts
- *   Dim IV — Riesgo Jurídico-Procesal = (J1+J2+J3)    × 2.5     → máx. 15 pts
- *   TOTAL = Dim I + Dim II + Dim III + Dim IV          → escala 0-100
+ * FÓRMULAS DE CÁLCULO:
+ *   Dim I  — Volatilidad                  = (V1+V2+V3+V4) × 3.75     → máx. 30 pts
+ *   Dim II — Custodia                     = (C1+C2)       × 6.25     → máx. 25 pts
+ *   Dim III — Inejecutabilidad del decomiso= (I1+I2)       × 6.25     → máx. 25 pts
+ *   Dim IV — Contexto operativo policial  = (J1+J2+J3)    × (10/3)   → máx. 20 pts
+ *   TOTAL = Dim I + Dim II + Dim III + Dim IV                → escala 0-100
  *
  * VERIFICACIÓN: suma de máximos ponderados = 35 + 25 + 25 + 15 = 100 puntos ✓
  *
@@ -19,7 +19,7 @@
  *   MGRPICScoring.calculateScore(respuestas)      → resultado completo con orientación
  *   MGRPICScoring.validateAnswers(respuestas)      → validación con detalle de pendientes
  *   MGRPICScoring.calcular(respuestas)             → alias de calculateScore (sin orientación)
- *   MGRPICScoring.totalIndicadores()               → número total de indicadores (15)
+ *   MGRPICScoring.totalIndicadores()               → número total de indicadores (11)
  *   MGRPICScoring.indicadoresRespondidos(resp)     → cuántos han sido respondidos
  *   MGRPICScoring.porcentajeCompletitud(resp)      → % de completitud (0-100)
  *   MGRPICScoring.ORIENTACIONES                    → textos de orientación por nivel
@@ -35,7 +35,7 @@
  *     total:        number   (0-100, dos decimales),
  *     nivelRiesgo:  { nivel, min, max, color, colorClaro, descripcion },
  *     orientacion:  string[] (lista de recomendaciones operativas),
- *     completo:     boolean  (true si los 15 indicadores tienen respuesta),
+ *     completo:     boolean  (true si los 11 indicadores tienen respuesta),
  *     pendientes:   number   (indicadores sin responder)
  *   }
  *
@@ -59,34 +59,34 @@ const MGRPICScoring = (() => {
 
     "BAJO": [
       "Mantener la custodia ordinaria de los criptoactivos con las medidas actualmente adoptadas.",
-      "Documentar el estado de la custodia en el acta de intervención y verificar periódicamente el saldo en blockchain.",
+      "Documentar el estado de la custodia en el acta de intervención y verificar el saldo en blockchain.",
       "No se aprecia necesidad de actuación urgente. Continuar el procedimiento con la tramitación habitual.",
-      "Informar al Juez de Instrucción del estado de la incautación con periodicidad trimestral o ante cualquier variación significativa de valor."
+      "Incorporar el presente resultado al atestado o informe de intervención. Reevaluar si algún indicador cambia significativamente."
     ],
 
     "MODERADO": [
-      "Revisar los indicadores con puntuación Moderado o Alto e identificar las deficiencias subsanables a corto plazo.",
-      "Valorar la conveniencia de elevar propuesta al Juez de Instrucción para la adopción de medidas cautelares preventivas.",
+      "Valorar la encomienda de la custodia a la ORGA o a un custodio institucional especializado.",
+      "Documentar las variaciones de precio del activo con periodicidad mensual y dejar constancia en el atestado.",
+      "Si el indicador V.2 asciende a Alto, elevar propuesta motivada al Ministerio Fiscal para que inste la enajenación anticipada conforme al art. 367 ter LECrim.",
       "Reforzar la cadena de custodia documentando formalmente todos los accesos y verificaciones periódicas.",
-      "Considerar la contratación de custodio institucional especializado si la duración estimada del proceso supera los 12 meses.",
-      "Documentar el contravalor en euros de los activos con periodicidad mensual para acreditar la variación de valor."
+      "Notificar al LAJ el nivel de riesgo para decisión coordinada sobre el modelo de custodia más adecuado."
     ],
 
     "ALTO": [
-      "Elevar propuesta motivada al Juez de Instrucción para la adopción urgente de medidas sobre los criptoactivos.",
-      "Solicitar autorización judicial para la contratación de custodio institucional especializado (Prosegur Crypto u ORGA).",
-      "Considerar la enajenación anticipada de los activos si la volatilidad o el riesgo de pérdida son determinantes.",
-      "Realizar verificación inmediata del saldo en blockchain y documentar el estado actual de la custodia.",
-      "Iniciar diligencias para obtener o asegurar las claves privadas si no están bajo control policial.",
-      "Informar al Ministerio Fiscal de la situación para que valore el ejercicio de acciones cautelares adicionales."
+      "Elevar propuesta motivada al Ministerio Fiscal en el plazo más breve posible para que inste la enajenación anticipada.",
+      "Solicitar perito especializado en activos digitales para reforzar la trazabilidad y el soporte técnico de la propuesta.",
+      "Valorar la enajenación anticipada del activo o su conversión a moneda fiduciaria estable conforme al art. 367 ter LECrim.",
+      "Realizar verificación inmediata del saldo en blockchain y documentar el estado actual de la custodia en acta formal.",
+      "Iniciar diligencias para obtener o asegurar las claves privadas si no están bajo control policial formalizado.",
+      "Notificar la situación al LAJ y al Ministerio Fiscal con el presente informe como soporte documental."
     ],
 
     "CRÍTICO": [
-      "ACTUACIÓN INMEDIATA IMPRESCINDIBLE. El riesgo de pérdida o frustración del decomiso es máximo.",
-      "Solicitar con carácter urgente (art. 367 ter LECrim) autorización judicial para enajenación anticipada o conversión a moneda fiat.",
-      "Si los activos están en exchanges, requerir con carácter urgente el bloqueo de las cuentas del investigado.",
-      "Contactar con la Unidad de Decomiso y Gestión de Activos del Ministerio de Justicia para activar el protocolo de actuación.",
-      "Elevar informe al Juez de Instrucción con la presente valoración de riesgo como soporte documental de la urgencia.",
+      "ACTUACIÓN INMEDIATA en las primeras 24 a 48 horas. El riesgo de pérdida patrimonial o frustración del decomiso es máximo.",
+      "Comunicación urgente al Ministerio Fiscal con elevación inmediata de propuesta de enajenación anticipada al amparo del art. 367 ter LECrim.",
+      "Apertura de pieza separada de responsabilidad civil para documentar la cadena de valor desde la incautación.",
+      "Valorar el bloqueo cautelar de activos en los exchanges identificados mediante solicitud urgente a través de la Fiscalía.",
+      "Contactar con la Unidad de Decomiso y Gestión de Activos para activar el protocolo de actuación en activos digitales.",
       "Registrar con carácter inmediato toda incidencia en el acta de incautación para preservar la responsabilidad institucional.",
       "Valorar la solicitud de perito forense especializado en blockchain si la trazabilidad de los activos está comprometida."
     ]
@@ -160,10 +160,10 @@ const MGRPICScoring = (() => {
       });
 
       // ── Aplicar fórmula ponderada de la dimensión ──────────────────────
-      //   Dim I   = sumaBruta × 4.375  (máx.  8 × 4.375 = 35)
-      //   Dim II  = sumaBruta × 3.125  (máx.  8 × 3.125 = 25)
-      //   Dim III = sumaBruta × 3.125  (máx.  8 × 3.125 = 25)
-      //   Dim IV  = sumaBruta × 2.5    (máx.  6 × 2.5   = 15)
+      //   Dim I   = sumaBruta × 3.75    (máx.  8 × 3.75   = 30)
+      //   Dim II  = sumaBruta × 6.25    (máx.  4 × 6.25   = 25)
+      //   Dim III = sumaBruta × 6.25    (máx.  4 × 6.25   = 25)
+      //   Dim IV  = sumaBruta × (10/3)  (máx.  6 × (10/3) = 20)
       const puntuacion  = parseFloat((sumaBruta * dim.factor).toFixed(4));
 
       // Porcentaje de riesgo dentro de la propia dimensión (0-100 %)
@@ -213,7 +213,7 @@ const MGRPICScoring = (() => {
    *
    * @param {object} respuestas - { indicadorId: valor (0|1|2), ... }
    * @returns {{
-   *   valido:      boolean,   — true si los 15 indicadores tienen respuesta
+   *   valido:      boolean,   — true si los 11 indicadores tienen respuesta
    *   respondidos: number,    — indicadores con respuesta
    *   total:       number,    — total de indicadores en la matriz (15)
    *   porcentaje:  number,    — % de completitud (0-100)
