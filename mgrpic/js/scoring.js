@@ -7,11 +7,10 @@
  * el nivel de riesgo y la orientación operativa correspondiente.
  *
  * FÓRMULAS DE CÁLCULO:
- *   Dim I  — Volatilidad                  = (V1+V2+V3+V4) × 3.75     → máx. 30 pts
- *   Dim II — Custodia                     = (C1+C2)       × 6.25     → máx. 25 pts
- *   Dim III — Inejecutabilidad del decomiso= (I1+I2)       × 6.25     → máx. 25 pts
- *   Dim IV — Contexto operativo policial  = (J1+J2+J3)    × (10/3)   → máx. 20 pts
- *   TOTAL = Dim I + Dim II + Dim III + Dim IV                → escala 0-100
+ *   Dim I  — Volatilidad                  = (V1+V2+V3+V4) × 4,375    → máx. 35 pts
+ *   Dim II — Custodia y trazabilidad      = (C1+C2+C3)    × 5,0      → máx. 30 pts
+ *   Dim III — Contexto operativo policial = (J1+J2+J3)    × (35/6)   → máx. 35 pts
+ *   TOTAL = Dim I + Dim II + Dim III                        → escala 0-100
  *
  * VERIFICACIÓN: suma de máximos ponderados = 35 + 25 + 25 + 15 = 100 puntos ✓
  *
@@ -19,7 +18,7 @@
  *   MGRPICScoring.calculateScore(respuestas)      → resultado completo con orientación
  *   MGRPICScoring.validateAnswers(respuestas)      → validación con detalle de pendientes
  *   MGRPICScoring.calcular(respuestas)             → alias de calculateScore (sin orientación)
- *   MGRPICScoring.totalIndicadores()               → número total de indicadores (11)
+ *   MGRPICScoring.totalIndicadores()               → número total de indicadores (10)
  *   MGRPICScoring.indicadoresRespondidos(resp)     → cuántos han sido respondidos
  *   MGRPICScoring.porcentajeCompletitud(resp)      → % de completitud (0-100)
  *   MGRPICScoring.ORIENTACIONES                    → textos de orientación por nivel
@@ -160,10 +159,9 @@ const MGRPICScoring = (() => {
       });
 
       // ── Aplicar fórmula ponderada de la dimensión ──────────────────────
-      //   Dim I   = sumaBruta × 3.75    (máx.  8 × 3.75   = 30)
-      //   Dim II  = sumaBruta × 6.25    (máx.  4 × 6.25   = 25)
-      //   Dim III = sumaBruta × 6.25    (máx.  4 × 6.25   = 25)
-      //   Dim IV  = sumaBruta × (10/3)  (máx.  6 × (10/3) = 20)
+      //   Dim I   = sumaBruta × 4,375  (máx.  8 × 4,375  = 35)
+      //   Dim II  = sumaBruta × 5,0    (máx.  6 × 5,0    = 30)
+      //   Dim III = sumaBruta × (35/6) (máx.  6 × (35/6) = 35)
       const puntuacion  = parseFloat((sumaBruta * dim.factor).toFixed(4));
 
       // Porcentaje de riesgo dentro de la propia dimensión (0-100 %)
@@ -213,7 +211,7 @@ const MGRPICScoring = (() => {
    *
    * @param {object} respuestas - { indicadorId: valor (0|1|2), ... }
    * @returns {{
-   *   valido:      boolean,   — true si los 11 indicadores tienen respuesta
+   *   valido:      boolean,   — true si los 10 indicadores tienen respuesta
    *   respondidos: number,    — indicadores con respuesta
    *   total:       number,    — total de indicadores en la matriz (15)
    *   porcentaje:  number,    — % de completitud (0-100)

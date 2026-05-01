@@ -32,7 +32,7 @@
       </div>
       <!-- Indicador de progreso global (oculto en pantalla 0) -->
       <div class="header-progress" id="headerProgress" aria-hidden="true">
-        <span class="progress-label" id="progressLabel">Paso 1 de 7</span>
+        <span class="progress-label" id="progressLabel">Paso 1 de 6</span>
         <div class="progress-bar-wrap">
           <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
         </div>
@@ -94,12 +94,12 @@
           <div class="info-card-icon">📋</div>
           <h3>¿Cómo funciona?</h3>
           <p>
-            La matriz evalúa <strong>11 indicadores</strong> agrupados en
-            <strong>4 dimensiones ponderadas</strong>: Volatilidad (30&nbsp;%),
-            Custodia (25&nbsp;%), Inejecutabilidad del decomiso (25&nbsp;%) y
-            Contexto operativo policial (20&nbsp;%). Cada indicador se puntúa en
-            una escala de 0 a 2 (Bajo / Moderado / Alto). La puntuación total,
-            expresada en una escala de 0 a 100, determina el nivel de riesgo global.
+            La matriz evalúa <strong>10 indicadores</strong> agrupados en
+            <strong>3 dimensiones ponderadas</strong>: Volatilidad (35&nbsp;%),
+            Custodia y trazabilidad (30&nbsp;%) y Contexto operativo policial
+            (35&nbsp;%). Cada indicador se puntúa en una escala de 0 a 2
+            (Bajo / Moderado / Alto). La puntuación total, expresada en una
+            escala de 0 a 100, determina el nivel de riesgo global.
           </p>
         </div>
 
@@ -142,7 +142,7 @@
 
       <footer class="home-footer">
         <p>
-          Versión 2.0 · Uso exclusivo para unidades de Policía Judicial españolas ·
+          Versión 3.0 · Uso exclusivo para unidades de Policía Judicial españolas ·
           Los resultados tienen carácter orientativo · No es una herramienta judicial
         </p>
       </footer>
@@ -156,7 +156,7 @@
       <div class="screen-container">
 
         <div class="screen-header">
-          <div class="screen-step-badge">Paso 1 de 7</div>
+          <div class="screen-step-badge">Paso 1 de 6</div>
           <h2 class="screen-title">Datos del caso</h2>
           <p class="screen-desc">
             Introduzca los datos identificativos del procedimiento. Estos datos
@@ -281,22 +281,21 @@
 
 
     <!-- ───────────────────────────────────────────
-         PANTALLAS 2-5 — DIMENSIONES (generadas por JS)
+         PANTALLAS 2-4 — DIMENSIONES (generadas por JS)
          ─────────────────────────────────────────── -->
     <section class="screen hidden" id="screen2" data-screen="2"></section>
     <section class="screen hidden" id="screen3" data-screen="3"></section>
     <section class="screen hidden" id="screen4" data-screen="4"></section>
+
+    <!-- ───────────────────────────────────────────
+         PANTALLA 5 — RESULTADOS (generada por JS)
+         ─────────────────────────────────────────── -->
     <section class="screen hidden" id="screen5" data-screen="5"></section>
 
     <!-- ───────────────────────────────────────────
-         PANTALLA 6 — RESULTADOS (generada por JS)
+         PANTALLA 6 — INFORME (generada por JS)
          ─────────────────────────────────────────── -->
     <section class="screen hidden" id="screen6" data-screen="6"></section>
-
-    <!-- ───────────────────────────────────────────
-         PANTALLA 7 — INFORME (generada por JS)
-         ─────────────────────────────────────────── -->
-    <section class="screen hidden" id="screen7" data-screen="7"></section>
 
   </main><!-- /#appMain -->
 

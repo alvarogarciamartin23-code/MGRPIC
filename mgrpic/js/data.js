@@ -7,33 +7,32 @@
  * Estructura de puntuación:
  *   Cada indicador puntúa 0 (Bajo), 1 (Moderado) o 2 (Alto).
  *   La suma bruta de cada dimensión se multiplica por su factor de ponderación.
- *   La puntuación total es la suma de las cuatro dimensiones (escala 0-100).
+ *   La puntuación total es la suma de las tres dimensiones (escala 0-100).
  *
  * Fórmulas:
- *   Dim I  (Volatilidad)                  = (V1+V2+V3+V4) × 3.75
- *   Dim II (Custodia)                     = (C1+C2)       × 6.25
- *   Dim III (Inejecutabilidad del decomiso)= (I1+I2)       × 6.25
- *   Dim IV (Contexto operativo policial)  = (J1+J2+J3)    × (10/3)
- *   TOTAL = Dim I + Dim II + Dim III + Dim IV  (0-100 puntos)
+ *   Dim I  (Volatilidad)                  = (V1+V2+V3+V4) × 4,375
+ *   Dim II (Custodia y trazabilidad)      = (C1+C2+C3)    × 5,0
+ *   Dim III (Contexto operativo policial) = (J1+J2+J3)    × (35/6)
+ *   TOTAL = Dim I + Dim II + Dim III  (0-100 puntos)
  *
  * Verificación de máximos:
- *   Dim I  : 8 × 3.75   = 30
- *   Dim II : 4 × 6.25   = 25
- *   Dim III: 4 × 6.25   = 25
- *   Dim IV : 6 × (10/3) = 20
- *   TOTAL máximo        = 100 ✓
+ *   Dim I  : 8 × 4,375   = 35
+ *   Dim II : 6 × 5,0     = 30
+ *   Dim III: 6 × (35/6)  = 35
+ *   TOTAL máximo          = 100 ✓
  *
  * Uso:
  *   La herramienta se aplica cuando el criptoactivo ya ha sido incautado y transferido
  *   al monedero bajo control policial. Apoya dos decisiones:
  *     1. Qué modelo de custodia adoptar.
- *     2. Si procede elevar propuesta de enajenación anticipada al Ministerio Fiscal.
+ *     2. Si procede elevar propuesta de enajenación anticipada al Ministerio Fiscal
+ *        al amparo del artículo 367 ter de la LECrim.
  *   NO es una herramienta judicial.
  */
 
 const MGRPIC_DATA = {
 
-  version: "2.0",
+  version: "3.0",
   nombre: "Matriz de Gestión de Riesgo Procesal en la Incautación de Criptoactivos",
   acronimo: "MGRPIC",
   descripcion: "Herramienta de apoyo a la decisión para unidades de Policía Judicial " +
@@ -50,9 +49,9 @@ const MGRPIC_DATA = {
       color:      "#70AD47",
       colorClaro: "#e8f5dd",
       colorTexto: "#3d7020",
-      descripcion: "Riesgo procesal controlado. Mantener custodia ordinaria bajo supervisión " +
-                   "del LAJ. Incorporar resultado al atestado. Reevaluar si algún indicador " +
-                   "cambia significativamente."
+      descripcion: "Riesgo procesal controlado. Custodia ordinaria bajo supervisión del LAJ. " +
+                   "Incorporar resultado al atestado. Reevaluar si algún indicador cambia " +
+                   "significativamente, en particular ante variaciones relevantes del precio del activo."
     },
     {
       nivel:      "MODERADO",
@@ -74,8 +73,9 @@ const MGRPIC_DATA = {
       colorClaro: "#fff0d9",
       colorTexto: "#a04800",
       descripcion: "Riesgo procesal elevado. Elevar propuesta motivada al Ministerio Fiscal " +
-                   "en el plazo más breve posible. Solicitar perito especializado en activos " +
-                   "digitales. Valorar la enajenación anticipada o conversión a moneda fiduciaria estable."
+                   "en el plazo más breve posible, con fundamento en la evaluación MGRPIC. " +
+                   "Solicitar perito especializado en activos digitales. Valorar la enajenación " +
+                   "anticipada o conversión a moneda fiduciaria estable."
     },
     {
       nivel:      "CRÍTICO",
@@ -99,16 +99,16 @@ const MGRPIC_DATA = {
 
     /* ══════════════════════════════════════════
      * DIMENSIÓN I — VOLATILIDAD
-     * Peso: 30 % | Factor: 3.75 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 30
+     * Peso: 35 % | Factor: 4,375 | Indicadores: 4 | Máx. bruto: 8 | Máx. ponderado: 35
      * ══════════════════════════════════════════ */
     {
       id:           "D1",
       codigo:       "V",
       nombre:       "Volatilidad",
-      peso:         30,
-      factor:       3.75,
+      peso:         35,
+      factor:       4.375,
       maxBruto:     8,
-      maxPonderado: 30,
+      maxPonderado: 35,
       color:        "#6c3483",
       descripcion:  "Evalúa el riesgo de pérdida de valor económico de los criptoactivos " +
                     "durante la tramitación del procedimiento penal.",
@@ -122,21 +122,9 @@ const MGRPIC_DATA = {
           ayuda:       "Clasifique el activo principal incautado según su categoría de mercado. " +
                        "Si hay varios activos, valore el de mayor cuantía.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Stablecoin referenciada a moneda fiduciaria (USDT, USDC)"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Criptoactivo de alta capitalización con mercado líquido (BTC, ETH)"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Altcoin de baja capitalización, activo desconocido o token sin mercado secundario activo"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Stablecoin referenciada a moneda fiduciaria (USDT, USDC)" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Criptoactivo de alta capitalización con mercado líquido (BTC, ETH)" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Altcoin de baja capitalización, activo desconocido o token sin mercado secundario activo" }
           ]
         },
         {
@@ -147,21 +135,9 @@ const MGRPIC_DATA = {
           ayuda:       "Consulte fuentes como CoinMarketCap o CoinGecko para obtener la variación " +
                        "en los 30 días anteriores a la fecha de incautación.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Inferior al 10% sin tendencia marcada"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Entre el 10% y el 30%"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Superior al 30% o variación brusca superior al 15% en las últimas 48 horas"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Inferior al 10% sin tendencia marcada" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Entre el 10% y el 30%" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Superior al 30% o variación brusca superior al 15% en las últimas 48 horas" }
           ]
         },
         {
@@ -172,21 +148,9 @@ const MGRPIC_DATA = {
           ayuda:       "Tenga en cuenta el número de investigados, la existencia de diligencias " +
                        "internacionales y la complejidad económica de la causa.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Causa sencilla, investigado único, sin cooperación internacional y sin complejidad económica relevante"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Causa con varios investigados o con alguna diligencia internacional pendiente o complejidad económica media"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Causa compleja con múltiples investigados, cooperación internacional activa o estructura criminal organizada"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Causa sencilla, investigado único, sin cooperación internacional y sin complejidad económica relevante" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Causa con varios investigados o con alguna diligencia internacional pendiente o complejidad económica media" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Causa compleja con múltiples investigados, cooperación internacional activa o estructura criminal organizada" }
           ]
         },
         {
@@ -197,41 +161,29 @@ const MGRPIC_DATA = {
           ayuda:       "Utilice el tipo de cambio del día de la evaluación. Si hay múltiples activos, " +
                        "sume todos los contravalores en euros.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Inferior a 10.000 €"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Entre 10.000 € y 500.000 €"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Superior a 500.000 €"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Inferior a 10.000 €" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Entre 10.000 € y 500.000 €" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Superior a 500.000 €" }
           ]
         }
       ]
     },
 
     /* ══════════════════════════════════════════
-     * DIMENSIÓN II — CUSTODIA
-     * Peso: 25 % | Factor: 6.25 | Indicadores: 2 | Máx. bruto: 4 | Máx. ponderado: 25
+     * DIMENSIÓN II — CUSTODIA Y TRAZABILIDAD
+     * Peso: 30 % | Factor: 5,0 | Indicadores: 3 | Máx. bruto: 6 | Máx. ponderado: 30
      * ══════════════════════════════════════════ */
     {
       id:           "D2",
       codigo:       "C",
-      nombre:       "Custodia",
-      peso:         25,
-      factor:       6.25,
-      maxBruto:     4,
-      maxPonderado: 25,
+      nombre:       "Custodia y Trazabilidad",
+      peso:         30,
+      factor:       5.0,
+      maxBruto:     6,
+      maxPonderado: 30,
       color:        "#1a5276",
-      descripcion:  "Evalúa la seguridad física y documental del sistema de custodia " +
-                    "de las claves privadas de los criptoactivos incautados.",
+      descripcion:  "Evalúa la seguridad de la custodia de las claves privadas y la " +
+                    "calidad de la trazabilidad del activo en la cadena de bloques.",
 
       indicadores: [
         {
@@ -242,21 +194,9 @@ const MGRPIC_DATA = {
           ayuda:       "Valore el soporte de custodia principal. Si hay múltiples carteras con distintos " +
                        "soportes, puntúe según el activo de mayor valor.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Custodio institucional especializado (Prosegur Crypto o ORGA) con contrato formalizado"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Monedero frío policial bajo acta formal de entrega al LAJ"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Soporte en papel, dispositivo sin cifrar, soporte no verificado o custodia informal sin acta"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Custodio institucional especializado (Prosegur Crypto o ORGA) con contrato formalizado" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Monedero frío policial bajo acta formal de entrega al LAJ" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Soporte en papel, dispositivo sin cifrar, soporte no verificado o custodia informal sin acta" }
           ]
         },
         {
@@ -267,108 +207,39 @@ const MGRPIC_DATA = {
           ayuda:       "Incluya a todos los agentes, funcionarios y terceros que hayan tenido acceso " +
                        "a la información de acceso a la cartera.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Una sola persona con acta de entrega y registro nominativo"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Dos o tres personas con registro documentado de acceso"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Más de tres personas o acceso sin documentación formal"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Una sola persona con acta de entrega y registro nominativo" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Dos o tres personas con registro documentado de acceso" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Más de tres personas o acceso sin documentación formal" }
           ]
-        }
-      ]
-    },
-
-    /* ══════════════════════════════════════════
-     * DIMENSIÓN III — INEJECUTABILIDAD DEL DECOMISO
-     * Peso: 25 % | Factor: 6.25 | Indicadores: 2 | Máx. bruto: 4 | Máx. ponderado: 25
-     * ══════════════════════════════════════════ */
-    {
-      id:           "D3",
-      codigo:       "I",
-      nombre:       "Inejecutabilidad del Decomiso",
-      peso:         25,
-      factor:       6.25,
-      maxBruto:     4,
-      maxPonderado: 25,
-      color:        "#1e8449",
-      descripcion:  "Evalúa los factores que pueden impedir la ejecución efectiva del decomiso " +
-                    "de los criptoactivos una vez dictada la resolución judicial.",
-
-      indicadores: [
+        },
         {
-          id:          "I1",
-          codigo:      "I.1",
+          id:          "C3",
+          codigo:      "C.3",
           nombre:      "Calidad de la trazabilidad del activo en la cadena de bloques",
           descripcion: "Grado de vinculación acreditada entre las direcciones de cartera y el investigado.",
           ayuda:       "Valore si existe informe forense de blockchain, si la vinculación es directa " +
                        "(datos KYC del exchange) o inferida mediante heurísticas de agrupamiento.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Dirección pública verificada y vinculada directamente al investigado mediante datos del exchange con KYC"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Dirección identificada mediante heurísticas de clustering, sin vinculación directa al investigado"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Activo trazado parcialmente o flujo interrumpido por mixer, tumbler o moneda de privacidad"
-            }
-          ]
-        },
-        {
-          id:          "I2",
-          codigo:      "I.2",
-          nombre:      "Localización de los activos respecto a exchanges cooperantes",
-          descripcion: "Situación de los activos en relación con plataformas sometidas a obligaciones de cooperación judicial.",
-          ayuda:       "Valore si los activos están en exchanges regulados en España/UE con protocolo de " +
-                       "cooperación establecido, o en plataformas descentralizadas o no cooperantes.",
-          opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Todos los activos identificados en exchanges sujetos a obligaciones de cooperación judicial"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Activos parcialmente en exchanges de cooperación limitada o en proceso de identificación"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Activos en exchanges no identificados, descentralizados o en jurisdicciones no cooperantes"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Dirección pública verificada y vinculada directamente al investigado mediante datos del exchange con KYC" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Dirección identificada mediante heurísticas de clustering, sin vinculación directa al investigado" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Activo trazado parcialmente o flujo interrumpido por mixer, tumbler o moneda de privacidad" }
           ]
         }
       ]
     },
 
     /* ══════════════════════════════════════════
-     * DIMENSIÓN IV — CONTEXTO OPERATIVO POLICIAL
-     * Peso: 20 % | Factor: 10/3 ≈ 3.3333 | Indicadores: 3 | Máx. bruto: 6 | Máx. ponderado: 20
+     * DIMENSIÓN III — CONTEXTO OPERATIVO POLICIAL
+     * Peso: 35 % | Factor: 35/6 ≈ 5,8333 | Indicadores: 3 | Máx. bruto: 6 | Máx. ponderado: 35
      * ══════════════════════════════════════════ */
     {
-      id:           "D4",
+      id:           "D3",
       codigo:       "J",
       nombre:       "Contexto Operativo Policial",
-      peso:         20,
-      factor:       10 / 3,
+      peso:         35,
+      factor:       35 / 6,
       maxBruto:     6,
-      maxPonderado: 20,
+      maxPonderado: 35,
       color:        "#922b21",
       descripcion:  "Evalúa las condiciones operativas de la unidad policial actuante y la " +
                     "urgencia de la decisión sobre custodia y enajenación anticipada.",
@@ -382,21 +253,9 @@ const MGRPIC_DATA = {
           ayuda:       "Compruebe si la unidad dispone de protocolo escrito, de personal con formación " +
                        "acreditada o de acceso a una unidad especializada de apoyo.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Unidad con protocolo específico documentado y personal con formación acreditada en activos digitales"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Sin protocolo propio pero con acceso a unidad especializada de apoyo disponible"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Sin protocolo, sin personal formado y sin unidad especializada de apoyo disponible"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Unidad con protocolo específico documentado y personal con formación acreditada en activos digitales" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Sin protocolo propio pero con acceso a unidad especializada de apoyo disponible" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Sin protocolo, sin personal formado y sin unidad especializada de apoyo disponible" }
           ]
         },
         {
@@ -407,21 +266,9 @@ const MGRPIC_DATA = {
           ayuda:       "Combine la volatilidad del activo con la duración estimada de la causa para " +
                        "determinar si la custodia ordinaria genera riesgo patrimonial relevante.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Activo estable en valor y causa de corta duración estimada; la custodia ordinaria no genera riesgo patrimonial relevante"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Activo con volatilidad moderada o causa larga; conveniente elevar propuesta de enajenación al Fiscal en plazo breve"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Activo con alta volatilidad o valor elevado con causa larga; la custodia ordinaria genera riesgo patrimonial inmediato que justifica propuesta urgente"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Activo estable en valor y causa de corta duración estimada; la custodia ordinaria no genera riesgo patrimonial relevante" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Activo con volatilidad moderada o causa larga; conveniente elevar propuesta de enajenación al Fiscal en plazo breve" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Activo con alta volatilidad o valor elevado con causa larga; la custodia ordinaria genera riesgo patrimonial inmediato que justifica propuesta urgente" }
           ]
         },
         {
@@ -432,21 +279,9 @@ const MGRPIC_DATA = {
           ayuda:       "Verifique si existe contrato con custodio, acta de entrega entre LAJ y Policía Judicial, " +
                        "o si la custodia se desarrolla sin documentación formal de responsabilidad.",
           opciones: [
-            {
-              valor:    0,
-              nivel:    "Bajo",
-              etiqueta: "Responsabilidad sobre la clave claramente atribuida al custodio institucional mediante contrato o convenio formal"
-            },
-            {
-              valor:    1,
-              nivel:    "Moderado",
-              etiqueta: "Responsabilidad compartida entre LAJ y Policía Judicial con acta de entrega formalmente documentada"
-            },
-            {
-              valor:    2,
-              nivel:    "Alto",
-              etiqueta: "Custodia sin atribución clara de responsabilidad o sin documentación formal de la entrega de la clave"
-            }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Responsabilidad sobre la clave claramente atribuida al custodio institucional mediante contrato o convenio formal" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Responsabilidad compartida entre LAJ y Policía Judicial con acta de entrega formalmente documentada" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Custodia sin atribución clara de responsabilidad o sin documentación formal de la entrega de la clave" }
           ]
         }
       ]

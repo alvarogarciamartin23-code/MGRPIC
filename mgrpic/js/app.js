@@ -50,10 +50,10 @@ const App = (() => {
 
   /* ─────────────────────────────────────────────
    * MAPA: número de pantalla → índice de dimensión
-   * pantallas 2,3,4,5 corresponden a dimensiones 0,1,2,3
+   * pantallas 2,3,4 corresponden a dimensiones 0,1,2
    * ───────────────────────────────────────────── */
-  const PANTALLA_A_DIM = { 2: 0, 3: 1, 4: 2, 5: 3 };
-  const TOTAL_PASOS = 7; // pasos numerados 1-7 (pantallas 1-7)
+  const PANTALLA_A_DIM = { 2: 0, 3: 1, 4: 2 };
+  const TOTAL_PASOS = 6; // pasos numerados 1-6 (pantallas 1-6)
 
   /* ─────────────────────────────────────────────
    * LOGO SVG — hexágono institucional con red blockchain
@@ -79,7 +79,7 @@ const App = (() => {
    * I. INICIALIZACIÓN
    * ═══════════════════════════════════════════════ */
   function init() {
-    // Renderizar las pantallas de dimensiones en el DOM (pantallas 2-5)
+    // Renderizar las pantallas de dimensiones en el DOM (pantallas 2-4)
     _renderizarPantallasDimensiones();
 
     // Mostrar pantalla inicial
@@ -89,7 +89,7 @@ const App = (() => {
   /* ─────────────────────────────────────────────
    * Restaura el estado visual de una pantalla de dimensión
    * (radio buttons + clases selected-*) al navegar hacia ella.
-   * @param {number} numPantalla - 2, 3, 4 o 5.
+   * @param {number} numPantalla - 2, 3 o 4.
    * ───────────────────────────────────────────── */
   function _restaurarEstadoVisualDimension(numPantalla) {
     const dimIndex = PANTALLA_A_DIM[numPantalla];
@@ -190,13 +190,13 @@ const App = (() => {
     if (numeroPantalla === 1) {
       _restaurarFormularioCaso();
     }
-    if (numeroPantalla >= 2 && numeroPantalla <= 5) {
+    if (numeroPantalla >= 2 && numeroPantalla <= 4) {
       _restaurarEstadoVisualDimension(numeroPantalla);
     }
-    if (numeroPantalla === 6) {
+    if (numeroPantalla === 5) {
       _renderizarResultados();
     }
-    if (numeroPantalla === 7) {
+    if (numeroPantalla === 6) {
       _renderizarInforme();
     }
   }
@@ -291,7 +291,7 @@ const App = (() => {
       const paso = numPantalla;      // paso 2, 3, 4, 5 de 7
       const anterior = numPantalla - 1;
       const siguiente = numPantalla + 1;
-      const esUltima = numPantalla === 5;
+      const esUltima = numPantalla === 4;
 
       // Colores de la dimensión con opacidad para badges
       const colorHex = dim.color;
@@ -412,7 +412,7 @@ const App = (() => {
     const resultado = MGRPICScoring.calcular(estado.respuestas);
     estado.ultimoResultado = resultado;
     const nivel = resultado.nivelRiesgo;
-    const seccion = document.getElementById('screen6');
+    const seccion = document.getElementById('screen5');
     if (!seccion) return;
 
     const orientacion = ORIENTACIONES[nivel.nivel] || [];
@@ -463,7 +463,7 @@ const App = (() => {
     seccion.innerHTML = `
       <div class="screen-container">
         <div class="screen-header">
-          <div class="screen-step-badge">Paso 6 de ${TOTAL_PASOS}</div>
+          <div class="screen-step-badge">Paso 5 de ${TOTAL_PASOS}</div>
           <h2 class="screen-title">Resultados de la evaluación</h2>
           <p class="screen-desc">
             Puntuación global y desglose por dimensiones del caso
@@ -515,8 +515,8 @@ const App = (() => {
         </div>
 
         <div class="screen-nav">
-          <button class="btn btn-secondary" onclick="App.irA(5)">← Revisar indicadores</button>
-          <button class="btn btn-primary" onclick="App.irA(7)">Ver informe completo →</button>
+          <button class="btn btn-secondary" onclick="App.irA(4)">← Revisar indicadores</button>
+          <button class="btn btn-primary" onclick="App.irA(6)">Ver informe completo →</button>
         </div>
       </div>`;
 
@@ -603,7 +603,7 @@ const App = (() => {
    * ═══════════════════════════════════════════════ */
 
   function _renderizarInforme() {
-    const seccion = document.getElementById('screen7');
+    const seccion = document.getElementById('screen6');
     if (!seccion) return;
 
     const resultado = estado.ultimoResultado || MGRPICScoring.calcular(estado.respuestas);
@@ -626,7 +626,7 @@ const App = (() => {
           <button class="btn btn-secondary" id="btnCopiar" onclick="App.copiarInforme()">
             📋 Copiar texto
           </button>
-          <button class="btn btn-secondary" onclick="App.irA(6)">← Volver a resultados</button>
+          <button class="btn btn-secondary" onclick="App.irA(5)">← Volver a resultados</button>
           <button class="btn btn-secondary" onclick="App.nuevaEvaluacion()">↺ Nueva evaluación</button>
         </div>
 
