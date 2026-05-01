@@ -523,7 +523,189 @@ for titulo, descripcion in pasos:
 
 doc.add_paragraph()
 
-# ── Pie de página ─────────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+# 6. CAPTURAS DE PANTALLA DE LA APLICACIÓN
+# ══════════════════════════════════════════════════════════════════════════════
+import os as _os
+add_heading_annex(doc, '6. Capturas de pantalla de la aplicación')
+
+add_par(doc,
+    'Las siguientes imágenes muestran las pantallas principales de la MGRPIC v3.0. '
+    'La herramienta se ejecuta íntegramente en el navegador, sin instalación ni conexión a internet.',
+    size=10, color=NEGRO, sb=0, sa=8)
+
+capturas = [
+    ('cap0_inicio.png',
+     'Figura 1. Pantalla de inicio de la MGRPIC. Muestra el acceso a nueva evaluación y las tarjetas '
+     'informativas sobre el funcionamiento, los niveles de riesgo y el informe generado.'),
+    ('cap1_dim1.png',
+     'Figura 2. Evaluación de la Dimensión I — Volatilidad. Los cuatro indicadores (V.1 a V.4) deben '
+     'responderse antes de continuar. El contador de progreso indica los indicadores completados.'),
+    ('cap5_resultados.png',
+     'Figura 3. Pantalla de resultados (Caso C de referencia: 58,75 puntos — nivel ALTO). '
+     'Muestra la puntuación global, el desglose por dimensión y el protocolo policial de actuación.'),
+    ('cap6_informe.png',
+     'Figura 4. Informe estructurado generado automáticamente. Incluye los datos del caso, '
+     'la puntuación y el nivel de riesgo, el desglose por dimensión e indicador, y el protocolo de actuación.'),
+]
+
+base_dir = '/home/user/MGRPIC/mgrpic'
+for fname, caption in capturas:
+    img_path = _os.path.join(base_dir, fname)
+    if _os.path.exists(img_path):
+        p_img = doc.add_paragraph()
+        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.paragraph_format.space_before = Pt(8)
+        p_img.paragraph_format.space_after  = Pt(2)
+        run_img = p_img.add_run()
+        run_img.add_picture(img_path, width=Cm(14))
+        p_cap = doc.add_paragraph()
+        p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_cap.paragraph_format.space_before = Pt(2)
+        p_cap.paragraph_format.space_after  = Pt(12)
+        r_cap = p_cap.add_run(caption)
+        r_cap.font.size   = Pt(9)
+        r_cap.font.italic = True
+        r_cap.font.name   = 'Calibri'
+        r_cap.font.color.rgb = GRIS_TEXT
+
+doc.add_paragraph()
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 7. MUESTRA DEL INFORME GENERADO (CASO C)
+# ══════════════════════════════════════════════════════════════════════════════
+add_heading_annex(doc, '7. Muestra del informe generado — Caso C (58,75 — ALTO)')
+
+add_par(doc,
+    'A continuación se reproduce el texto íntegro del informe que la MGRPIC genera automáticamente '
+    'al concluir la evaluación del Caso C de referencia (BTC + ETH, DP 47/2025, UDEF-BLA). '
+    'El informe se estructura en seis apartados y está diseñado para adjuntarse al atestado '
+    'o trasladarse al Ministerio Fiscal.',
+    size=10, color=NEGRO, sb=0, sa=8)
+
+# ─── Cabecera del informe ────────────────────────────────────────────────────
+hdr_tbl = doc.add_table(rows=1, cols=1)
+hdr_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+hdr_cell = hdr_tbl.cell(0, 0)
+set_cell_bg(hdr_cell, '1F3864')
+ph = hdr_cell.paragraphs[0]
+ph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+ph.paragraph_format.space_before = Pt(8)
+ph.paragraph_format.space_after  = Pt(2)
+rh = ph.add_run('MGRPIC — INFORME DE EVALUACIÓN DE RIESGO PROCESAL')
+rh.font.size = Pt(11); rh.font.bold = True; rh.font.name = 'Calibri'
+rh.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+ph2 = hdr_cell.add_paragraph()
+ph2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+ph2.paragraph_format.space_before = Pt(0)
+ph2.paragraph_format.space_after  = Pt(8)
+rh2 = ph2.add_run('Matriz de Gestión de Riesgo Procesal en la Incautación de Criptoactivos · v3.0')
+rh2.font.size = Pt(9); rh2.font.name = 'Calibri'
+rh2.font.color.rgb = RGBColor(0xBF, 0xD3, 0xE8)
+
+doc.add_paragraph()
+
+def informe_seccion(titulo, contenido_items):
+    """Bloque de sección del informe con fondo gris claro."""
+    p = doc.add_paragraph()
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after  = Pt(2)
+    r = p.add_run(titulo)
+    r.font.size = Pt(10); r.font.bold = True; r.font.name = 'Calibri'
+    r.font.color.rgb = AZUL
+    for item in contenido_items:
+        if isinstance(item, tuple):
+            label, valor = item
+            pi = doc.add_paragraph()
+            pi.paragraph_format.space_before = Pt(1)
+            pi.paragraph_format.space_after  = Pt(1)
+            pi.paragraph_format.left_indent  = Cm(0.5)
+            rl = pi.add_run(label + ': ')
+            rl.font.size = Pt(9.5); rl.font.bold = True; rl.font.name = 'Calibri'
+            rl.font.color.rgb = NEGRO
+            rv = pi.add_run(valor)
+            rv.font.size = Pt(9.5); rv.font.name = 'Calibri'; rv.font.color.rgb = NEGRO
+        else:
+            pi = doc.add_paragraph()
+            pi.paragraph_format.space_before = Pt(1)
+            pi.paragraph_format.space_after  = Pt(1)
+            pi.paragraph_format.left_indent  = Cm(0.5)
+            rv = pi.add_run(item)
+            rv.font.size = Pt(9.5); rv.font.name = 'Calibri'; rv.font.color.rgb = NEGRO
+
+# 1. Datos del caso
+informe_seccion('1. Datos del caso', [
+    ('Número de diligencias', 'DP 47/2025 — Juzgado Central de Instrucción n.º 3 (AN)'),
+    ('Unidad policial actuante', 'UDEF-BLA — Unidad de Delincuencia Económica y Fiscal'),
+    ('Fecha de incautación', '2025-03-10'),
+    ('Tipo de activo digital', 'Bitcoin (BTC) + Ethereum (ETH)'),
+    ('Órgano judicial', 'Juzgado Central de Instrucción n.º 3 — Audiencia Nacional'),
+    ('Observaciones', 'Organización criminal transnacional con múltiples investigados. Activos intervenidos en operación coordinada con Europol.'),
+])
+
+doc.add_paragraph()
+
+# 2. Resultado global
+res_tbl = doc.add_table(rows=1, cols=3)
+res_tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+res_tbl.style = 'Table Grid'
+widths_r = [Cm(5), Cm(4), Cm(7)]
+etiquetas_r = ['PUNTUACIÓN GLOBAL', 'NIVEL DE RIESGO', 'DESCRIPCIÓN']
+valores_r   = ['58,75 / 100', 'ALTO', 'Riesgo procesal elevado. Elevar propuesta motivada al Ministerio Fiscal en el plazo más breve posible.']
+bgs_r       = ['FFF0D9', 'FF9933', 'FFF0D9']
+for ci in range(3):
+    cell = res_tbl.cell(0, ci)
+    cell.width = widths_r[ci]
+    set_cell_bg(cell, bgs_r[ci])
+    p = cell.paragraphs[0]
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after  = Pt(2)
+    re = p.add_run(etiquetas_r[ci])
+    re.font.size = Pt(8); re.font.bold = True; re.font.name = 'Calibri'
+    re.font.color.rgb = RGBColor(0xA0, 0x48, 0x00)
+    p2 = cell.add_paragraph()
+    p2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p2.paragraph_format.space_before = Pt(2)
+    p2.paragraph_format.space_after  = Pt(6)
+    rv2 = p2.add_run(valores_r[ci])
+    rv2.font.size = Pt(9 if ci == 2 else 13)
+    rv2.font.bold = (ci < 2)
+    rv2.font.name = 'Calibri'
+    rv2.font.color.rgb = RGBColor(0xA0, 0x48, 0x00)
+
+doc.add_paragraph()
+
+# 3. Desglose por dimensión
+informe_seccion('3. Desglose por dimensión', [
+    ('Dim. I  — Volatilidad (peso 35 %)', '5 / 8 brutos → 21,88 / 35 ponderados · 62,5 % de riesgo en la dimensión'),
+    ('Dim. II — Custodia y Trazabilidad (peso 30 %)', '3 / 6 brutos → 15,00 / 30 ponderados · 50,0 % de riesgo en la dimensión'),
+    ('Dim. III — Contexto Operativo Policial (peso 35 %)', '3 / 6 brutos → 21,87 / 35 ponderados · 50,0 % de riesgo en la dimensión'),
+    ('TOTAL', '58,75 / 100 — nivel ALTO (umbral 51–75)'),
+])
+
+doc.add_paragraph()
+
+# 4. Protocolo de actuación
+informe_seccion('4. Protocolo policial de actuación — Nivel ALTO', [
+    '• Elevar propuesta motivada al Ministerio Fiscal en el plazo más breve posible para que inste la enajenación anticipada.',
+    '• Solicitar perito especializado en activos digitales para reforzar la trazabilidad y el soporte técnico de la propuesta.',
+    '• Valorar la enajenación anticipada del activo o su conversión a moneda fiduciaria estable conforme al art. 367 ter LECrim.',
+    '• Realizar verificación inmediata del saldo en blockchain y documentar el estado actual de la custodia en acta formal.',
+    '• Iniciar diligencias para obtener o asegurar las claves privadas si no están bajo control policial formalizado.',
+    '• Notificar la situación al LAJ y al Ministerio Fiscal con el presente informe como soporte documental.',
+])
+
+doc.add_paragraph()
+
+# Pie de informe
+add_par(doc,
+    'Informe generado por MGRPIC v3.0 · Herramienta de apoyo a la decisión para unidades de Policía Judicial · '
+    'Los resultados tienen carácter orientativo · No es una herramienta judicial',
+    size=8, italic=True, color=GRIS_TEXT,
+    align=WD_ALIGN_PARAGRAPH.CENTER, sb=8, sa=12)
+
+# ── Pie de página final ────────────────────────────────────────────────────────
 add_par(doc,
     'MGRPIC v3.0 · Instrumento de uso exclusivo para unidades de Policía Judicial · '
     'Los resultados tienen carácter orientativo · No es una herramienta judicial',
