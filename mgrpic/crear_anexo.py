@@ -705,6 +705,259 @@ add_par(doc,
     size=8, italic=True, color=GRIS_TEXT,
     align=WD_ALIGN_PARAGRAPH.CENTER, sb=8, sa=12)
 
+# ══════════════════════════════════════════════════════════════════════════════
+# 8. APARTADO TÉCNICO: CÓDIGO Y CONSTRUCCIÓN
+# ══════════════════════════════════════════════════════════════════════════════
+doc.add_page_break()
+add_heading_annex(doc, '8. Apartado técnico: código y construcción de la herramienta')
+
+add_par(doc,
+    'La MGRPIC se ha construido como una aplicación web de página única (SPA) en HTML5, CSS3 y '
+    'JavaScript puro, sin dependencias de frameworks ni librerías externas. El código fuente '
+    'se distribuye en cinco archivos especializados que se empaquetan en un único archivo '
+    'HTML autocontenido (MGRPIC.html) para su distribución.',
+    size=10, color=NEGRO, sb=0, sa=8)
+
+# ── 8.1 Arquitectura general ─────────────────────────────────────────────────
+add_heading_annex(doc, '8.1  Arquitectura general', level=2)
+
+add_par(doc,
+    'La herramienta adopta el patrón IIFE (Immediately Invoked Function Expression) para encapsular '
+    'cada módulo en su propio ámbito léxico, evitando colisiones de nombres en el espacio global. '
+    'Cada módulo expone únicamente su API pública. El estado global de la evaluación se mantiene '
+    'en memoria durante la sesión mediante un objeto plano compartido por el controlador de la aplicación:',
+    size=10, color=NEGRO, sb=0, sa=6)
+
+estado_code = (
+    "const estado = {\n"
+    "    datosCaso:       {},   // Metadatos del caso (diligencias, unidad, fecha…)\n"
+    "    respuestas:      {},   // { V1: 0|1|2, V2: …, C1: …, J1: … }\n"
+    "    ultimoResultado: null, // Resultado de calculateScore() tras el paso 5\n"
+    "    pantallaActual:  0     // Índice de la pantalla visible (0–6)\n"
+    "};"
+)
+p_code = doc.add_paragraph()
+p_code.paragraph_format.space_before = Pt(4)
+p_code.paragraph_format.space_after  = Pt(8)
+p_code.paragraph_format.left_indent  = Cm(0.5)
+r_code = p_code.add_run(estado_code)
+r_code.font.name = 'Courier New'
+r_code.font.size = Pt(8.5)
+r_code.font.color.rgb = RGBColor(0x1F, 0x38, 0x64)
+
+add_par(doc,
+    'No se utiliza ningún sistema de enrutamiento, DOM virtual ni gestión reactiva de estado. '
+    'La navegación entre pantallas se gestiona mostrando o ocultando secciones HTML mediante '
+    'la clase CSS hidden, con transiciones de opacidad controladas por JavaScript.',
+    size=10, color=NEGRO, sb=0, sa=8)
+
+# ── 8.2 Estructura de archivos ────────────────────────────────────────────────
+add_heading_annex(doc, '8.2  Estructura de archivos fuente', level=2)
+
+files_info = [
+    ('index.html',      '~320 líneas',  'Estructura HTML de las siete pantallas. Las pantallas 2 a 6 se '
+                                        'renderizan dinámicamente mediante JavaScript; solo la pantalla 0 '
+                                        '(inicio) y la 1 (datos del caso) están maquetadas estáticamente.'),
+    ('css/styles.css',  '~1 443 líneas','Hoja de estilos completa: layout de cabecera y pantallas, '
+                                        'tarjetas de indicadores, tabla de resultados, estilos de impresión '
+                                        '(@media print) y paleta de colores institucional.'),
+    ('js/data.js',      '~297 líneas',  'Definición canónica y estática de dimensiones, indicadores, '
+                                        'opciones de respuesta y escala de riesgo. Actúa como única fuente '
+                                        'de verdad del modelo. Cualquier modificación de ponderaciones o '
+                                        'indicadores se realiza exclusivamente en este archivo.'),
+    ('js/scoring.js',   '~305 líneas',  'Motor de cálculo. Implementa calculateScore(), validateAnswers() '
+                                        'y los alias de compatibilidad. Independiente de la interfaz: '
+                                        'recibe el objeto de respuestas y devuelve puntuaciones detalladas '
+                                        'por dimensión, total ponderado, nivel de riesgo y orientaciones.'),
+    ('js/report.js',    '~400 líneas',  'Generador del informe HTML. Construye el marcado del informe '
+                                        'final a partir del resultado de scoring.js e incluye la lógica '
+                                        'de impresión y copia al portapapeles.'),
+    ('js/app.js',       '~782 líneas',  'Controlador principal. Gestiona la navegación entre pantallas, '
+                                        'renderiza las dimensiones e indicadores, captura las respuestas '
+                                        'del usuario, actualiza el indicador de progreso global y coordina '
+                                        'la llamada a scoring.js y report.js.'),
+]
+
+t_files = doc.add_table(rows=len(files_info)+1, cols=3)
+t_files.style = 'Table Grid'
+t_files.alignment = WD_TABLE_ALIGNMENT.LEFT
+
+hdrs_f = ['Archivo', 'Tamaño', 'Responsabilidad']
+w_f    = [Cm(3.5), Cm(2.2), Cm(9.8)]
+for ci, hdr in enumerate(hdrs_f):
+    cell = t_files.rows[0].cells[ci]
+    cell.width = w_f[ci]
+    set_cell_bg(cell, '1F3864')
+    ph = cell.paragraphs[0]
+    ph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    ph.paragraph_format.space_before = Pt(3)
+    ph.paragraph_format.space_after  = Pt(3)
+    rh = ph.add_run(hdr)
+    rh.font.size = Pt(9); rh.font.bold = True; rh.font.name = 'Calibri'
+    rh.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+
+for ri, (fname, size, desc) in enumerate(files_info):
+    row = t_files.rows[ri+1]
+    for ci in range(3): row.cells[ci].width = w_f[ci]
+    set_cell_bg(row.cells[0], 'E6EFF8')
+    for ci, val in enumerate([fname, size, desc]):
+        p = row.cells[ci].paragraphs[0]
+        p.paragraph_format.space_before = Pt(3)
+        p.paragraph_format.space_after  = Pt(3)
+        if ci < 2:
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        r = p.add_run(val)
+        r.font.size = Pt(9)
+        r.font.name = 'Courier New' if ci == 0 else 'Calibri'
+        r.font.bold = (ci == 0)
+        r.font.color.rgb = AZUL if ci == 0 else NEGRO
+
+doc.add_paragraph()
+
+# ── 8.3 Motor de cálculo (scoring.js) ────────────────────────────────────────
+add_heading_annex(doc, '8.3  Motor de cálculo — scoring.js', level=2)
+
+add_par(doc,
+    'El módulo MGRPICScoring implementa la lógica de puntuación de forma completamente independiente '
+    'de la interfaz. La función principal calculateScore() itera sobre las dimensiones definidas '
+    'en data.js, aplica el factor de ponderación de cada una y acumula la puntuación total:',
+    size=10, color=NEGRO, sb=0, sa=6)
+
+formula_code = (
+    "// Fórmulas de ponderación\n"
+    "Dim I  (Volatilidad)          = (V1+V2+V3+V4) × 4,375   → máx. 35 pts\n"
+    "Dim II (Custodia)             = (C1+C2+C3)    × 5,000   → máx. 30 pts\n"
+    "Dim III (Contexto policial)   = (J1+J2+J3)    × 5,833…  → máx. 35 pts\n"
+    "─────────────────────────────────────────────────────────\n"
+    "TOTAL = Dim I + Dim II + Dim III               → escala 0–100\n\n"
+    "// Factor exacto D3: 35/6 (JavaScript evalúa en tiempo de análisis)\n"
+    "// Verificación: 6 × (35/6) = 35 exacto; suma de máximos = 35+30+35 = 100 ✓"
+)
+p_f = doc.add_paragraph()
+p_f.paragraph_format.space_before = Pt(4)
+p_f.paragraph_format.space_after  = Pt(8)
+p_f.paragraph_format.left_indent  = Cm(0.5)
+r_f = p_f.add_run(formula_code)
+r_f.font.name = 'Courier New'
+r_f.font.size = Pt(8.5)
+r_f.font.color.rgb = RGBColor(0x1F, 0x38, 0x64)
+
+add_par(doc,
+    'La API pública del módulo expone también validateAnswers() —que bloquea el avance a resultados '
+    'si algún indicador no ha sido respondido— y funciones auxiliares para calcular el porcentaje '
+    'de completitud del formulario en tiempo real.',
+    size=10, color=NEGRO, sb=0, sa=8)
+
+# ── 8.4 Controlador de navegación (app.js) ────────────────────────────────────
+add_heading_annex(doc, '8.4  Controlador de navegación — app.js', level=2)
+
+add_par(doc,
+    'El objeto global App expone la API de navegación de la herramienta. La función irA(n) '
+    'gestiona la transición entre las siete pantallas de la aplicación aplicando las siguientes '
+    'reglas de negocio:',
+    size=10, color=NEGRO, sb=0, sa=6)
+
+nav_items = [
+    'Pantallas 0 y 1 (inicio / datos del caso): acceso libre.',
+    'Pantallas 2, 3 y 4 (dimensiones I–III): se renderiza la dimensión correspondiente en la primera '
+    'visita; la validación de indicadores se realiza al intentar avanzar a la pantalla siguiente, '
+    'bloqueando el avance si algún indicador de la dimensión actual no ha sido respondido.',
+    'Pantalla 5 (resultados): se llama a MGRPICScoring.calculateScore() y se renderiza el panel '
+    'de resultados con el desglose por dimensión, los factores de mayor riesgo y el protocolo '
+    'policial de actuación.',
+    'Pantalla 6 (informe): se llama a MGRPICReport.generarHTML() con el resultado de scoring y '
+    'los datos del caso para producir el informe final imprimible.',
+]
+for item in nav_items:
+    pi = doc.add_paragraph(style='List Bullet')
+    pi.paragraph_format.space_before = Pt(1)
+    pi.paragraph_format.space_after  = Pt(3)
+    pi.paragraph_format.left_indent  = Cm(0.5)
+    ri = pi.add_run(item)
+    ri.font.size = Pt(10); ri.font.name = 'Calibri'; ri.font.color.rgb = NEGRO
+
+doc.add_paragraph()
+
+# ── 8.5 Proceso de empaquetado ────────────────────────────────────────────────
+add_heading_annex(doc, '8.5  Proceso de empaquetado: generación de MGRPIC.html', level=2)
+
+add_par(doc,
+    'Para la distribución se genera un único archivo HTML autocontenido (MGRPIC.html) mediante '
+    'un script Python que inlinea la hoja de estilos y los cuatro módulos JavaScript directamente '
+    'en el HTML, sustituyendo las etiquetas <link> y <script src="…"> por bloques <style> y '
+    '<script> con el contenido de cada archivo. El resultado es un archivo de ~3 200 líneas '
+    'que funciona en cualquier navegador sin necesidad de servidor web, conexión a internet '
+    'ni instalación de software adicional.',
+    size=10, color=NEGRO, sb=0, sa=6)
+
+bundle_code = (
+    "# Fragmento del script de empaquetado (Python)\n"
+    "with open('index.html') as f: html = f.read()\n"
+    "with open('css/styles.css') as f: css = f.read()\n"
+    "with open('js/data.js')    as f: data = f.read()\n"
+    "with open('js/scoring.js') as f: scoring = f.read()\n"
+    "with open('js/report.js')  as f: report = f.read()\n"
+    "with open('js/app.js')     as f: app = f.read()\n\n"
+    "html = html.replace('<link rel=\"stylesheet\" href=\"css/styles.css\" />',\n"
+    "                    f'<style>\\n{css}\\n</style>')\n"
+    "html = html.replace('<script src=\"js/data.js\"></script>',\n"
+    "                    f'<script>\\n{data}\\n</script>')\n"
+    "# … ídem para scoring.js, report.js y app.js\n\n"
+    "with open('MGRPIC.html', 'w') as f: f.write(html)"
+)
+p_b = doc.add_paragraph()
+p_b.paragraph_format.space_before = Pt(4)
+p_b.paragraph_format.space_after  = Pt(8)
+p_b.paragraph_format.left_indent  = Cm(0.5)
+r_b = p_b.add_run(bundle_code)
+r_b.font.name = 'Courier New'
+r_b.font.size = Pt(8.5)
+r_b.font.color.rgb = RGBColor(0x1F, 0x38, 0x64)
+
+# ── 8.6 Decisiones de diseño ─────────────────────────────────────────────────
+add_heading_annex(doc, '8.6  Decisiones de diseño relevantes', level=2)
+
+decisiones = [
+    ('Sin frameworks ni dependencias',
+     'La ausencia de React, Vue, Angular o cualquier librería de terceros garantiza que la '
+     'herramienta no quede obsoleta por cambios en dependencias externas y puede ejecutarse '
+     'en entornos con acceso a internet restringido, habitual en redes policiales.'),
+    ('Módulo de datos como única fuente de verdad',
+     'Toda la definición de indicadores, ponderaciones y escala de riesgo reside en data.js. '
+     'Scoring.js y report.js leen los datos de este módulo; ningún valor de ponderación está '
+     'duplicado en el código. Esto permite modificar la matriz (añadir un indicador, cambiar '
+     'un factor) editando un único archivo.'),
+    ('Privacidad por diseño',
+     'Ningún dato introducido por el usuario abandona el dispositivo. No hay llamadas a APIs '
+     'externas, cookies, almacenamiento local (localStorage/sessionStorage) ni analítica. '
+     'El estado se mantiene exclusivamente en la memoria RAM de la pestaña del navegador '
+     'y desaparece al cerrarla.'),
+    ('CSS de impresión (@media print)',
+     'La hoja de estilos incluye reglas específicas para impresión que ocultan la navegación, '
+     'la cabecera y los controles, y aplican márgenes y tipografía adecuados para el formato '
+     'papel A4, permitiendo generar un PDF imprimible directamente desde el navegador.'),
+    ('Validación estricta antes de resultados',
+     'La función validateAnswers() impide avanzar a la pantalla de resultados si alguno de los '
+     '10 indicadores no ha sido respondido. La validación se realiza por dimensión al intentar '
+     'navegar, con identificación visual de los indicadores pendientes.'),
+]
+
+for titulo_d, texto_d in decisiones:
+    p_dt = doc.add_paragraph()
+    p_dt.paragraph_format.space_before = Pt(5)
+    p_dt.paragraph_format.space_after  = Pt(1)
+    r_dt = p_dt.add_run(titulo_d)
+    r_dt.font.size = Pt(10); r_dt.font.bold = True
+    r_dt.font.name = 'Calibri'; r_dt.font.color.rgb = AZUL_CLARO
+    p_dd = doc.add_paragraph()
+    p_dd.paragraph_format.space_before = Pt(0)
+    p_dd.paragraph_format.space_after  = Pt(4)
+    p_dd.paragraph_format.left_indent  = Cm(0.5)
+    r_dd = p_dd.add_run(texto_d)
+    r_dd.font.size = Pt(10); r_dd.font.name = 'Calibri'; r_dd.font.color.rgb = NEGRO
+
+doc.add_paragraph()
+
 # ── Pie de página final ────────────────────────────────────────────────────────
 add_par(doc,
     'MGRPIC v3.0 · Instrumento de uso exclusivo para unidades de Policía Judicial · '
