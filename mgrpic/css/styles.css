@@ -1133,6 +1133,28 @@ body {
   background: var(--color-primario-med);
 }
 
+.btn-pdf {
+  background: #c0392b;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(192,57,43,.25);
+}
+
+.btn-pdf:hover {
+  background: #a93226;
+  box-shadow: 0 4px 12px rgba(192,57,43,.35);
+}
+
+.btn-word {
+  background: #1f5a91;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(31,90,145,.25);
+}
+
+.btn-word:hover {
+  background: #184875;
+  box-shadow: 0 4px 12px rgba(31,90,145,.35);
+}
+
 
 /* ──────────────────────────────────────────
    11. UTILIDADES

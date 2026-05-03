@@ -612,21 +612,28 @@ const App = (() => {
     seccion.innerHTML = `
       <div class="screen-container">
         <div class="screen-header">
-          <div class="screen-step-badge">Paso 7 de ${TOTAL_PASOS} — Informe final</div>
+          <div class="screen-step-badge">Paso 6 de ${TOTAL_PASOS} — Informe final</div>
           <h2 class="screen-title">Informe MGRPIC</h2>
           <p class="screen-desc">
             Informe completo listo para incorporar al atestado o trasladar al Ministerio Fiscal.
+            Guárdelo en PDF o Word, imprímalo o copie el texto.
           </p>
         </div>
 
         <div class="report-actions">
+          <button class="btn btn-pdf" onclick="App.exportarPDF()">
+            📄 Guardar PDF
+          </button>
+          <button class="btn btn-word" id="btnExportarWord" onclick="App.exportarWord()">
+            📝 Guardar Word (.doc)
+          </button>
           <button class="btn btn-print" onclick="App.imprimirInforme()">
-            🖨 Imprimir / Guardar PDF
+            🖨 Imprimir
           </button>
           <button class="btn btn-secondary" id="btnCopiar" onclick="App.copiarInforme()">
             📋 Copiar texto
           </button>
-          <button class="btn btn-secondary" onclick="App.irA(5)">← Volver a resultados</button>
+          <button class="btn btn-secondary" onclick="App.irA(5)">← Resultados</button>
           <button class="btn btn-secondary" onclick="App.nuevaEvaluacion()">↺ Nueva evaluación</button>
         </div>
 
@@ -635,8 +642,11 @@ const App = (() => {
         </div>
 
         <div class="report-actions" style="padding-top: var(--gap-sm); border-top: 1px solid var(--color-border)">
-          <button class="btn btn-print" onclick="App.imprimirInforme()">
-            🖨 Imprimir / Guardar PDF
+          <button class="btn btn-pdf" onclick="App.exportarPDF()">
+            📄 Guardar PDF
+          </button>
+          <button class="btn btn-word" onclick="App.exportarWord()">
+            📝 Guardar Word (.doc)
           </button>
           <button class="btn btn-secondary" onclick="App.nuevaEvaluacion()">↺ Nueva evaluación</button>
         </div>
@@ -644,8 +654,138 @@ const App = (() => {
   }
 
   /* ═══════════════════════════════════════════════
-   * VII. IMPRESIÓN
+   * VII. IMPRESIÓN Y EXPORTACIÓN
    * ═══════════════════════════════════════════════ */
+
+  /**
+   * Devuelve el CSS mínimo necesario para los exportes PDF y Word,
+   * con todas las variables CSS resueltas a valores literales.
+   */
+  function _estiloExportacion() {
+    return `
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+        font-size: 11pt; color: #1c2535; line-height: 1.65;
+        padding: 1.5cm;
+      }
+      .report-section { margin-bottom: 1.5rem; page-break-inside: avoid; }
+      .report-section:last-child { margin-bottom: 0; }
+      .report-section-title {
+        font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.08em; color: #1F3864;
+        border-bottom: 2px solid #1F3864; padding-bottom: 0.3rem;
+        margin-bottom: 0.75rem;
+      }
+      .report-field {
+        display: grid; grid-template-columns: 200px 1fr;
+        gap: 0.35rem 0.75rem; padding: 0.3rem 0;
+        border-bottom: 1px dashed #dde3ec; font-size: 0.88rem;
+      }
+      .report-field:last-child { border-bottom: none; }
+      .report-field-label { font-weight: 600; color: #4a5e72; }
+      .report-total-box {
+        display: flex; align-items: center; gap: 1.25rem;
+        padding: 1.25rem; border-radius: 8px; margin-bottom: 1.25rem;
+      }
+      .report-total-score { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+      .report-total-nivel { font-size: 1.2rem; font-weight: 700; }
+      table { width: 100%; border-collapse: collapse; }
+      td, th { padding: 0.45rem 0.6rem; }
+      @page { size: A4; margin: 2.5cm 2cm 2.5cm 3cm; }
+      @media print { body { padding: 0; } }
+    `;
+  }
+
+  /**
+   * Abre el informe en una nueva pestaña con CSS limpio y activa el
+   * diálogo de impresión/guardar PDF automáticamente.
+   */
+  function exportarPDF() {
+    const resultado   = estado.ultimoResultado || MGRPICScoring.calcular(estado.respuestas);
+    const htmlInforme = MGRPICReport.generar(estado.datosCaso, resultado, ORIENTACIONES);
+
+    const htmlCompleto = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>MGRPIC — Informe de Evaluación</title>
+  <style>${_estiloExportacion()}</style>
+</head>
+<body>
+  ${htmlInforme}
+  <script>window.addEventListener('load', function(){ setTimeout(window.print, 400); });<\/script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank');
+    if (!win) {
+      alert('El navegador bloqueó la ventana emergente.\nPermita las ventanas emergentes para esta página e inténtelo de nuevo.');
+      return;
+    }
+    win.document.write(htmlCompleto);
+    win.document.close();
+  }
+
+  /**
+   * Genera el informe como documento Word (.doc) compatible y lo descarga.
+   * Usa HTML con las directivas de espacio de nombres de Office para que
+   * Word lo reconozca y aplique márgenes A4.
+   */
+  function exportarWord() {
+    const resultado   = estado.ultimoResultado || MGRPICScoring.calcular(estado.respuestas);
+    const htmlInforme = MGRPICReport.generar(estado.datosCaso, resultado, ORIENTACIONES);
+
+    const slug = (estado.datosCaso.numeroDiligencias || 'informe')
+      .replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_').substring(0, 40);
+    const fecha = new Date().toISOString().slice(0, 10);
+    const nombreArchivo = `MGRPIC_${slug}_${fecha}.doc`;
+
+    const htmlWord = `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+     xmlns:w="urn:schemas-microsoft-com:office:word"
+     xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="utf-8">
+  <title>MGRPIC — Informe de Evaluación</title>
+  <!--[if gte mso 9]><xml>
+    <w:WordDocument>
+      <w:View>Print</w:View><w:Zoom>100</w:Zoom>
+      <w:DoNotOptimizeForBrowser/>
+    </w:WordDocument>
+  </xml><![endif]-->
+  <style>
+    ${_estiloExportacion()}
+    body { mso-page-orientation: portrait; }
+    @page Section1 {
+      size: 21cm 29.7cm;
+      margin: 2.5cm 2cm 2.5cm 3cm;
+      mso-header-margin: 1cm; mso-footer-margin: 1cm;
+      mso-paper-source: 0;
+    }
+    div.Section1 { page: Section1; }
+  </style>
+</head>
+<body><div class="Section1">
+  ${htmlInforme}
+</div></body>
+</html>`;
+
+    const blob = new Blob(['﻿', htmlWord], { type: 'application/msword' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = nombreArchivo;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+    const btn = document.getElementById('btnExportarWord');
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Descargando…';
+      setTimeout(() => { btn.innerHTML = orig; }, 2500);
+    }
+  }
 
   /**
    * Copia el contenido del informe a la zona de impresión (oculta en pantalla,
@@ -775,6 +915,8 @@ const App = (() => {
     validarDimensionEIrA,
     registrarRespuesta,
     imprimirInforme,
+    exportarPDF,
+    exportarWord,
     copiarInforme,
     nuevaEvaluacion
   };
