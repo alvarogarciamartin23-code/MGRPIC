@@ -247,10 +247,10 @@ dims = [
              'Activo estable y causa corta; custodia ordinaria sin riesgo patrimonial relevante',
              'Volatilidad moderada o causa larga; conveniente elevar propuesta al Fiscal en plazo breve',
              'Alta volatilidad o valor elevado con causa larga; riesgo patrimonial inmediato'),
-            ('J.3', 'Claridad de la cadena de responsabilidad sobre el activo incautado',
-             'Responsabilidad claramente atribuida al custodio institucional mediante contrato formal',
-             'Responsabilidad compartida entre LAJ y Policía Judicial con acta de entrega documentada',
-             'Custodia sin atribución clara de responsabilidad o sin documentación formal'),
+            ('J.3', 'Historial de incidencias de la unidad',
+             'Sin incidencias documentadas en intervenciones previas con activos digitales',
+             'Algún antecedente de incidencia menor, documentado y resuelto',
+             'Incidencias graves previas o ausencia total de registro histórico'),
         ]
     },
 ]

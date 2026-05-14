@@ -2053,14 +2053,15 @@ const MGRPIC_DATA = {
         {
           id:          "J3",
           codigo:      "J.3",
-          nombre:      "Claridad de la cadena de responsabilidad sobre el activo incautado",
-          descripcion: "Grado de definición formal de quién responde del activo en cada fase del procedimiento.",
-          ayuda:       "Verifique si existe contrato con custodio, acta de entrega entre LAJ y Policía Judicial, " +
-                       "o si la custodia se desarrolla sin documentación formal de responsabilidad.",
+          nombre:      "Historial de incidencias de la unidad",
+          descripcion: "Existencia de antecedentes de incidencias en intervenciones previas con activos digitales en la unidad actuante.",
+          ayuda:       "Consulte el registro interno de incidencias de la unidad. Valore si existen antecedentes " +
+                       "de pérdidas, accesos no autorizados, fallos de custodia u otras incidencias en " +
+                       "intervenciones anteriores con criptoactivos.",
           opciones: [
-            { valor: 0, nivel: "Bajo",     etiqueta: "Responsabilidad sobre la clave claramente atribuida al custodio institucional mediante contrato o convenio formal" },
-            { valor: 1, nivel: "Moderado", etiqueta: "Responsabilidad compartida entre LAJ y Policía Judicial con acta de entrega formalmente documentada" },
-            { valor: 2, nivel: "Alto",     etiqueta: "Custodia sin atribución clara de responsabilidad o sin documentación formal de la entrega de la clave" }
+            { valor: 0, nivel: "Bajo",     etiqueta: "Sin incidencias documentadas en intervenciones previas con activos digitales" },
+            { valor: 1, nivel: "Moderado", etiqueta: "Algún antecedente de incidencia menor, documentado y resuelto" },
+            { valor: 2, nivel: "Alto",     etiqueta: "Incidencias graves previas o ausencia total de registro histórico" }
           ]
         }
       ]
